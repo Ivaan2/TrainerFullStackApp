@@ -1,4 +1,4 @@
--- CREACION DE LAS TABLAS
+-- CREACION DE LA TABLA USUARIO DE REGISTRO
 CREATE TABLE T_USUARIO_REGISTRO(
     ID_USUARIO_REGISTRO INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Identificador único de la tabla de usuario destinada al registro',
     D_NOMBRE VARCHAR(100) NOT NULL COMMENT 'Nombre del usuario',
@@ -11,13 +11,10 @@ CREATE TABLE T_USUARIO_REGISTRO(
     F_FECHA_BAJA DATE COMMENT 'Fecha en la que se da de baja el usuario, opcional'
 ) COMMENT = 'Tabla para almacenar información de los usuarios. No contiene datos relativos a la dieta.';
 
-SELECT * FROM T_USUARIO_REGISTRO;
-
 INSERT INTO T_USUARIO_REGISTRO
 (D_NOMBRE, D_APELLIDO1, D_APELLIDO2, D_EMAIL, N_TELEFONO, F_FECHA_BAJA)
 VALUES
-('Mario', 'Gonzáles', 'Labrador', 'mario.labrador@example.com', '666123987', NULL);
-INSERT INTO T_USUARIO_REGISTRO
-(ID_USUARIO_REGISTRO, D_NOMBRE, D_APELLIDO1, D_APELLIDO2, D_EMAIL, N_TELEFONO, F_FECHA_BAJA)
-VALUES
-(NULL, 'María', 'López', 'Fernández', 'maria.lopez@example.com', '678678678', NULL);
+('Mario', 'Gonzáles', 'Labrador', 'mario.labrador@example.com', '666123987', NULL),
+('María', 'López', 'Fernández', 'maria.lopez@example.com', '678678678', NULL);
+
+-- DROP TABLE t_usuario_registro;
