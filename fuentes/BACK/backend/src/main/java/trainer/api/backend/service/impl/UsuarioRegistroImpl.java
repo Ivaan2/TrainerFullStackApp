@@ -1,16 +1,16 @@
 package trainer.api.backend.service.impl;
 
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import trainer.api.backend.model.dao.IUsuarioRegistroDao;
 import trainer.api.backend.model.entity.UsuarioRegistro;
 import trainer.api.backend.service.IUsuarioRegistro;
 
 @Service
+@AllArgsConstructor
 public class UsuarioRegistroImpl implements IUsuarioRegistro {
 
-    @Autowired
     IUsuarioRegistroDao usuarioRegistroDao;
 
     @Transactional

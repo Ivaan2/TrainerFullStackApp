@@ -1,6 +1,6 @@
 package trainer.api.backend.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import trainer.api.backend.model.entity.UsuarioRegistro;
 import trainer.api.backend.service.IUsuarioRegistro;
@@ -8,11 +8,11 @@ import trainer.api.backend.service.IUsuarioRegistro;
 import java.util.Objects;
 
 @RestController
+@AllArgsConstructor
 @RequestMapping("/api/v1")
 public class UsuarioRegistroController {
 
-    @Autowired
-    private IUsuarioRegistro usuarioRegistroService;
+    private final IUsuarioRegistro usuarioRegistroService;
 
     @PostMapping("usuarioRegistro")
     public UsuarioRegistro create(@RequestBody UsuarioRegistro usuarioRegistro){
