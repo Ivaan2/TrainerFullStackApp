@@ -1,6 +1,6 @@
 CREATE TABLE T_COMIDA(
-	ID_COMIDA INT auto_increment PRIMARY KEY COMMENT 'Identificador de la comida asociada a una dieta',
-    FK_DIETA INT NOT NULL COMMENT 'Identificador de la dieta semanal',
+	ID_COMIDA BIGINT auto_increment PRIMARY KEY COMMENT 'Identificador de la comida asociada a una dieta',
+    FK_DIETA BIGINT NOT NULL COMMENT 'Identificador de la dieta semanal',
     D_NOMBRE ENUM('Desayuno', 'Media mañana', 'Almuerzo', 'Merienda', 'Cena') NOT NULL COMMENT 'Nombre del plato.',
     F_HORA TIME NOT NULL COMMENT 'Horario de ingesta del plato. (Formato HH:mm)',
     N_APORTE_CALORICO DECIMAL(6,2) NOT NULL COMMENT 'Aporte calórico.',

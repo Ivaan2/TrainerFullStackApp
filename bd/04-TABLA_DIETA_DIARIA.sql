@@ -1,9 +1,9 @@
 -- CREACION DE LA TABLA DIETA
 CREATE TABLE T_DIETA_DIARIA(
-	ID_DIETA INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Identificador de la información de la dieta diaria.',
-    FK_INFORME INT NOT NULL COMMENT 'Identificador de la tabla informe.',
+	ID_DIETA BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT 'Identificador de la información de la dieta diaria.',
+    FK_INFORME BIGINT NOT NULL COMMENT 'Identificador de la tabla informe.',
     D_DIA ENUM('L', 'M', 'X', 'J', 'V', 'S', 'D') NOT NULL COMMENT 'Nombre del día de la semana',
-    N_COMIDAS_DIARIAS INT NOT NULL COMMENT 'Número de comidas diaria para la dieta.',
+    N_COMIDAS_DIARIAS BIGINT NOT NULL COMMENT 'Número de comidas diaria para la dieta.',
     N_CALORIAS_TOTALES DECIMAL(6,2) NOT NULL COMMENT 'Objetivo calórico dirario',
     N_REQ_PROTE DECIMAL(5,2) NOT NULL COMMENT 'Establece el requerimiento proteico en gramos.',
     N_REQ_GRASA DECIMAL(5,2) NOT NULL COMMENT 'Establece el requerimiento de grasa en gramos.',
