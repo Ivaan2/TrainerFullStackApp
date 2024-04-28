@@ -10,3 +10,9 @@
         /React APP con Router DOM
 /fuentes
     /Proyecto FullStack
+
+* Próximas tareas *
+- Aplicar HttpResponse a las clases Usuario, Informe, Dieta, Comida
+- Aplicar JWT
+- Poblar con datos de prueba
+- Cerrar BackEnd
