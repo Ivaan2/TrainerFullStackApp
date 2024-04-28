@@ -1,9 +1,7 @@
 package trainer.api.backend.model.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 import java.sql.Date;
@@ -12,7 +10,9 @@ import java.sql.Timestamp;
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "T_USUARIO_REGISTRO")
 public class UsuarioRegistro implements Serializable {
     @Id

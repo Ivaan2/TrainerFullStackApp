@@ -6,6 +6,15 @@ CREATE TABLE T_INFORME(
 	D_SEXO ENUM('Masculino', 'Femenino') NOT NULL COMMENT 'Define el sexo del usuario (`Masculino`, `Femenino`)',
 	N_ALTURA BIGINT NOT NULL COMMENT 'Altura del usuario, en centímetros',
 	N_PESO DECIMAL(5,2) NOT NULL COMMENT 'Peso del usuario, con hasta 2 decimales',
+    N_CADERA DECIMAL(5,2) COMMENT 'Longitud de la cadera en cm',
+    N_BICEP DECIMAL(5,2) COMMENT 'Longitud del bíceps en cm',
+    N_ANTEBRAZO DECIMAL(5,2) COMMENT 'Longitud del antebrazo en cm',
+    N_HOMBRO DECIMAL(5,2) COMMENT 'Longitud de los hombros en cm',
+    N_PECHO DECIMAL(5,2) COMMENT 'Longitud del pecho en cm',
+    N_ABDOMEN DECIMAL(5,2) COMMENT 'Longitud del abdomen en cm',
+    N_CUADRICEP DECIMAL(5,2) COMMENT 'Longitud de los cuádriceps en cm',
+    N_GEMELOS DECIMAL(5,2) COMMENT 'Longitud de los gemelos en cm',
+    N_GLUTEO DECIMAL(5,2) COMMENT 'Longitud del glúteo en cm',
 	N_PORCENTAJE_GRASO DECIMAL(4,2) COMMENT 'Porcentaje graso corporal del usuario. Opcional',
 	N_PORCENTAJE_MUSCULO DECIMAL(4,2) COMMENT 'Porcentaje de masa muscular del usuario. Opcional',
 	D_NIVEL_ACTIVIDAD ENUM('Sedentario', 'Poca actividad física', 'Moderada', 'Alta', 'Muy Alta') NOT NULL COMMENT 'Indica el nivel de actividad física del usuario.',
@@ -20,5 +29,6 @@ INSERT INTO T_INFORME
 (FK_OBJETIVO, N_EDAD, D_SEXO, N_ALTURA, N_PESO, N_PORCENTAJE_GRASO, N_PORCENTAJE_MUSCULO, D_NIVEL_ACTIVIDAD)
 VALUES
 (1, 25, 'Masculino', 175, 70.00, 15.00, 40.00, 'Moderada');
+
 
 -- DROP TABLE T_INFORME;

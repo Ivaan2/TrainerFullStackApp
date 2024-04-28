@@ -10,7 +10,7 @@ CREATE TABLE T_DIETA_DIARIA(
     N_REQ_CARB DECIMAL(5,2) NOT NULL COMMENT 'Establece el requerimiento de carbohidratos en gramos.',
     N_REQ_AGUA DECIMAL(2,1) NOT NULL COMMENT 'Establece el requerimiento de litros de agua diarios.',
     CONSTRAINT FK_DIETA_INFORME FOREIGN KEY (FK_INFORME) REFERENCES T_INFORME(ID_INFORME)
-);
+) COMMENT = 'Información nutricional para la dieta diaria de un usuario.';
 
 INSERT INTO T_DIETA_DIARIA
 (FK_INFORME, D_DIA, N_COMIDAS_DIARIAS, N_CALORIAS_TOTALES, N_REQ_PROTE, N_REQ_GRASA, N_REQ_CARB, N_REQ_AGUA)

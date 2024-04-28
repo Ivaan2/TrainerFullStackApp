@@ -4,13 +4,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Timestamp;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class UsuarioRegistradoDTO {
+public class UsuarioRegistroDTO implements Serializable {
 
     private Long idUsuarioRegistro;
 

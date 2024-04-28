@@ -1,11 +1,17 @@
 package trainer.api.backend.model.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.Data;
+
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Entity
+@Data
+@Builder
 @Table(name = "T_OBJETIVO")
-public class Objetivo {
+public class Objetivo implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_OBJETIVO")

@@ -27,6 +27,33 @@ public class Informe {
     @Column(name = "N_PESO", nullable = false)
     private Double peso;
 
+    @Column(name = "N_CADERA", nullable = false)
+    private Double cadera;
+
+    @Column(name = "N_GEMELOS", nullable = false)
+    private Double gemelos;
+
+    @Column(name = "N_CUADRICEP", nullable = false)
+    private Double cuadriceps;
+
+    @Column(name = "N_ABDOMEN", nullable = false)
+    private Double abdomen;
+
+    @Column(name = "N_PECHO", nullable = false)
+    private Double pecho;
+
+    @Column(name = "N_HOMBRO", nullable = false)
+    private Double hombros;
+
+    @Column(name = "N_ANTEBRAZO", nullable = false)
+    private Double antebrazo;
+
+    @Column(name = "N_BICEP", nullable = false)
+    private Double biceps;
+
+    @Column(name = "N_GLUTEO", nullable = false)
+    private Double gluteos;
+
     @Column(name = "N_PORCENTAJE_GRASO")
     private Double porcentajeGraso;
 
