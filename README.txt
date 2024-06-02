@@ -16,3 +16,9 @@
 - Aplicar JWT
 - Poblar con datos de prueba
 - Cerrar BackEnd
+
+* Próximas tareas Front *
+- Prototipos formularios para recoger información del usuario via Figma
+- Responsive en table CHECK
+- Responsive en pc
+- Responsive en mobile
