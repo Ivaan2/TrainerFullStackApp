@@ -1,15 +1,13 @@
 package trainer.api.backend.model.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import java.util.List;
+import lombok.*;
 
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
+@Builder
 @NoArgsConstructor
 @Table(name = "T_DIETA_DIARIA")
 public class DietaDiaria {

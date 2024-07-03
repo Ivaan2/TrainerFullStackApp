@@ -7,6 +7,8 @@ import trainer.api.backend.model.dao.IComidaDao;
 import trainer.api.backend.model.entity.Comida;
 import trainer.api.backend.service.IComida;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class ComidaImpl implements IComida{
@@ -16,6 +18,15 @@ public class ComidaImpl implements IComida{
     @Transactional
     @Override
     public Comida save(Comida comida) {
+//        var comidaObj = Comida.builder()
+//                .aporteCalorico(comidaDto.getAporteCalorico())
+//                .hora(comidaDto.getHora())
+//                .aporteCarbohidratos(comidaDto.getAporteCarbohidratos())
+//                .aporteGrasa(comidaDto.getAporteGrasa())
+//                .aporteProteico(comidaDto.getAporteProteico())
+//                .nombre(comidaDto.getNombre())
+//                .dietaDiaria(comidaDto.getDietaDiaria())
+//                .build();
         return comidaDao.save(comida);
     }
 
@@ -29,5 +40,15 @@ public class ComidaImpl implements IComida{
     @Override
     public void delete(Comida comida) {
         comidaDao.delete(comida);
+    }
+
+    @Transactional
+    @Override
+    public List<Comida> findList(Long idDieta) {
+        List<Comida> listaComida = comidaDao.findByIdDieta(idDieta);
+        if (listaComida.isEmpty()){
+            return null;
+        }
+        return listaComida;
     }
 }

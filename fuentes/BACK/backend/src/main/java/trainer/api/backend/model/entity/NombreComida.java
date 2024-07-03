@@ -1,5 +1,8 @@
 package trainer.api.backend.model.entity;
 
+import lombok.Getter;
+
+@Getter
 public enum NombreComida {
-    DESAYUNO, MEDIA_MAÑANA, ALMUERZO, MERIENDA, CENA
+    DESAYUNO, MEDIA_MANANA, ALMUERZO, MERIENDA, CENA;
 }

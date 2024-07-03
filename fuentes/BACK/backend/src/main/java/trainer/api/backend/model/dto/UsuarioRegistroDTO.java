@@ -1,8 +1,6 @@
 package trainer.api.backend.model.dto;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 import java.sql.Date;
@@ -11,6 +9,8 @@ import java.sql.Timestamp;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UsuarioRegistroDTO implements Serializable {
 
     private Long idUsuarioRegistro;
@@ -22,6 +22,8 @@ public class UsuarioRegistroDTO implements Serializable {
     private String apellido2;
 
     private String email;
+
+    private String password;
 
     private String telefono;
 

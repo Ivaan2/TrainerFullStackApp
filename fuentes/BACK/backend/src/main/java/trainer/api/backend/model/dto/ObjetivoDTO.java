@@ -7,9 +7,9 @@ import java.sql.Timestamp;
 @Getter
 @Setter
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class ObjetivoDTO {
 
     private Long id;

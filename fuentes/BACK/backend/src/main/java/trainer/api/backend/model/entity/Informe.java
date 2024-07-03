@@ -1,9 +1,18 @@
 package trainer.api.backend.model.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.sql.Timestamp;
 
 @Entity
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "T_INFORME")
 public class Informe {
     @Id
@@ -27,31 +36,31 @@ public class Informe {
     @Column(name = "N_PESO", nullable = false)
     private Double peso;
 
-    @Column(name = "N_CADERA", nullable = false)
+    @Column(name = "N_CADERA")
     private Double cadera;
 
-    @Column(name = "N_GEMELOS", nullable = false)
+    @Column(name = "N_GEMELOS")
     private Double gemelos;
 
-    @Column(name = "N_CUADRICEP", nullable = false)
+    @Column(name = "N_CUADRICEP")
     private Double cuadriceps;
 
-    @Column(name = "N_ABDOMEN", nullable = false)
+    @Column(name = "N_ABDOMEN")
     private Double abdomen;
 
-    @Column(name = "N_PECHO", nullable = false)
+    @Column(name = "N_PECHO")
     private Double pecho;
 
-    @Column(name = "N_HOMBRO", nullable = false)
+    @Column(name = "N_HOMBRO")
     private Double hombros;
 
-    @Column(name = "N_ANTEBRAZO", nullable = false)
+    @Column(name = "N_ANTEBRAZO")
     private Double antebrazo;
 
-    @Column(name = "N_BICEP", nullable = false)
+    @Column(name = "N_BICEP")
     private Double biceps;
 
-    @Column(name = "N_GLUTEO", nullable = false)
+    @Column(name = "N_GLUTEO")
     private Double gluteos;
 
     @Column(name = "N_PORCENTAJE_GRASO")

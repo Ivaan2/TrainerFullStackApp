@@ -1,13 +1,13 @@
 package trainer.api.backend.model.dto;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import trainer.api.backend.model.entity.DiaSemana;
 
 @Getter
 @Setter
+@AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class DietaDiariaDTO {
 
     private Long id;

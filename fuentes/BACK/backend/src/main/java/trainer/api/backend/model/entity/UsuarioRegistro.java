@@ -29,6 +29,9 @@ public class UsuarioRegistro implements Serializable {
     @Column(name = "D_APELLIDO2", length = 100)
     private String apellido2;
 
+    @Column(name = "D_PASSWORD", length = 255, nullable = false)
+    private String password;
+
     @Column(name = "D_EMAIL", nullable = false, unique = true, length = 255)
     private String email;
 
