@@ -16,7 +16,9 @@ INSERT INTO T_OBJETIVO (
 ) VALUES (
     'Perder 10kg en 6 meses',
     '2024-08-31 00:00:00',
-    (select u.ID_USUARIO_REGISTRO from t_usuario_registro u where u.D_EMAIL = 'maria.lopez@example.com')
+    (select u.ID_USUARIO_REGISTRO from t_usuario_registro u where u.D_EMAIL = 'rosa@prueba.com')
 );
+
+SELECT * FROM t_objetivo WHERE t_objetivo.FK_USUARIO = 4;
 
 -- DROP TABLE T_OBJETIVO;
