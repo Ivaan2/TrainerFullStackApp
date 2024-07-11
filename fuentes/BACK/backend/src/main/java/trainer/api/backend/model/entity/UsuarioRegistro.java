@@ -38,16 +38,6 @@ public class UsuarioRegistro implements Serializable {
     @Column(name = "N_EDAD")
     private Integer edad;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "D_SEXO")
-    private Sexo sexo;
-
-    @Column(name = "N_ALTURA")
-    private Integer altura;
-
-    @Column(name = "N_PESO")
-    private Double peso;
-
     @Column(name = "F_FECHA_REGISTRO", nullable = false)
     private Timestamp fechaRegistro;
 

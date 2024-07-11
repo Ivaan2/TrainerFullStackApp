@@ -1,6 +1,7 @@
 package trainer.api.backend.controller;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import trainer.api.backend.service.IUsuarioRegistro;
 import java.sql.Timestamp;
 import java.util.Date;
 
+@Slf4j
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1")
@@ -24,12 +26,14 @@ public class UsuarioRegistroController {
     private final IUsuarioRegistro usuarioRegistroService;
     private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    @PostMapping("usuarioRegistro")
+    @PostMapping("/usuarioRegistro")
     public ResponseEntity<?> create(@RequestBody UsuarioRegistroDTO usuarioRegistroDto){
+        log.info("** Lanzando POST Method **");
         if(ObjectUtils.isNotEmpty(usuarioRegistroDto)){
             var nuevo_usuario = new UsuarioRegistro();
             usuarioDTOToEntity(usuarioRegistroDto, nuevo_usuario);
             usuarioRegistroService.save(nuevo_usuario);
+            log.info("Entidad guardada en base de datos");
             return new ResponseEntity<>(MensajeResponse.builder()
                     .mensaje("Guardado correctamente")
                     .object(nuevo_usuario)
@@ -39,7 +43,7 @@ public class UsuarioRegistroController {
         return new ResponseEntity<>(usuarioRegistroDto, HttpStatus.BAD_REQUEST);
     }
 
-    @PutMapping("usuarioRegistro/{id}")
+    @PutMapping("/usuarioRegistro/{id}")
     public ResponseEntity<?> update(@RequestBody UsuarioRegistroDTO usuarioRegistroDto, @PathVariable Long id) {
         UsuarioRegistro usuarioExistente = usuarioRegistroService.findById(id);
 
@@ -61,17 +65,21 @@ public class UsuarioRegistroController {
     }
 
     private static void usuarioDTOToEntity(UsuarioRegistroDTO usuarioRegistroDto, UsuarioRegistro usuarioExistente) {
+        log.info("Parseando DTO a Entidad");
         usuarioExistente.setNombre(usuarioRegistroDto.getNombre());
         usuarioExistente.setApellido1(usuarioRegistroDto.getApellido1());
         usuarioExistente.setApellido2(usuarioRegistroDto.getApellido2());
         usuarioExistente.setEmail(usuarioRegistroDto.getEmail());
-        usuarioExistente.setTelefono(usuarioRegistroDto.getTelefono());
         usuarioExistente.setFechaActualizacion(new Timestamp(new Date().getTime()));
         usuarioExistente.setPassword(passwordEncoder.encode(usuarioRegistroDto.getPassword()));
+        usuarioExistente.setEdad(usuarioRegistroDto.getEdad());
+        usuarioExistente.setFechaRegistro(new Timestamp(new Date().getTime()));
+        usuarioExistente.setFechaActualizacion(null);
+        usuarioExistente.setFechaBaja(null);
     }
 
 
-    @DeleteMapping("usuarioRegistro/{id}")
+    @DeleteMapping("/usuarioRegistro/{id}")
     public ResponseEntity<?> deleteById(@PathVariable Long id){
         var usuarioRegistro = new UsuarioRegistro();
         try{
@@ -83,8 +91,59 @@ public class UsuarioRegistroController {
         return new ResponseEntity<>(usuarioRegistro, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @GetMapping("usuarioRegistro/{id}")
-    public UsuarioRegistro showById(@PathVariable Long id){
-        return usuarioRegistroService.findById(id);
+    @GetMapping("/usuarioRegistro/{id}")
+    public ResponseEntity<?> showById(@PathVariable Long id){
+        log.info("** Lanzando GET Method **");
+        var usuarioRegistro = usuarioRegistroService.findById(id);
+        if (ObjectUtils.isEmpty(usuarioRegistro)) return ResponseEntity.badRequest().build();
+        return new ResponseEntity<>(MensajeResponse.builder()
+                .mensaje("Se ha encontrado un usuario")
+                .object(usuarioRegistro).build(),
+        HttpStatus.OK);
+    }
+
+    @PatchMapping("/usuarioRegistro/{id}")
+    public ResponseEntity<?> updatePassword(@PathVariable Long id, @RequestBody String password){
+        log.info("*** Actualizando contraseña ***");
+        if (ObjectUtils.isEmpty(password)){
+            return new ResponseEntity<>(MensajeResponse.builder()
+                    .mensaje("La contraseña no es válida")
+                    .object(null).build(),
+                HttpStatus.BAD_REQUEST);
+        }
+        var usuarioExistente = usuarioRegistroService.findById(id);
+        if (ObjectUtils.isEmpty(usuarioExistente)){
+            return new ResponseEntity<>(MensajeResponse.builder()
+                    .mensaje("No existe ese usuario")
+                    .object(null).build(),
+                HttpStatus.BAD_REQUEST);
+        }
+        usuarioExistente.setPassword(passwordEncoder.encode(password));
+        usuarioRegistroService.save(usuarioExistente);
+        return new ResponseEntity<>(MensajeResponse.builder()
+                .mensaje("Se ha actualizado la contraseña correctamente")
+                .object(usuarioExistente).build(),
+                HttpStatus.OK);
+    }
+
+    @GetMapping("usuarioRegistro/password/{id}")
+    public ResponseEntity<?> getPasswordCodificada(@PathVariable Long id){
+        if (ObjectUtils.isEmpty(id) || id==0){
+            return new ResponseEntity<>(MensajeResponse.builder()
+                    .mensaje("El id proporcionado es incorrecto")
+                    .object(null).build(),
+                    HttpStatus.BAD_REQUEST);
+        }
+        var usuarioExistente = usuarioRegistroService.findById(id);
+        if (ObjectUtils.isEmpty(usuarioExistente)){
+            return new ResponseEntity<>(MensajeResponse.builder()
+                    .mensaje("No se ha encontrado el usuario")
+                    .object(null).build(),
+                HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(MensajeResponse.builder()
+                .mensaje("La contrseña ha sido encontrada correctamente")
+                .object(usuarioExistente.getPassword()).build(),
+            HttpStatus.OK);
     }
 }

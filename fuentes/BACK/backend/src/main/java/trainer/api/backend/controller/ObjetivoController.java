@@ -1,5 +1,6 @@
 package trainer.api.backend.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataAccessException;
@@ -10,13 +11,18 @@ import trainer.api.backend.model.dto.ObjetivoDTO;
 import trainer.api.backend.model.entity.Objetivo;
 import trainer.api.backend.model.payload.MensajeResponse;
 import trainer.api.backend.service.IObjetivo;
+import trainer.api.backend.service.IUsuarioRegistro;
 
+import java.util.List;
+
+@Slf4j
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1")
 public class ObjetivoController {
 
     private final IObjetivo objetivoService;
+    private final IUsuarioRegistro usuarioRegistroService;
 
     @PostMapping("objetivo")
     public ResponseEntity<?> create(@RequestBody ObjetivoDTO objetivoDto){
@@ -125,5 +131,28 @@ public class ObjetivoController {
                 .object(null)
                 .build()
             , HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping("objetivos/{id}")
+    public ResponseEntity<?> obtenerListaByIdUsuario(@PathVariable Long id){
+        log.info("*** Obteniendolista de objetivos para un usuario ***");
+        if (ObjectUtils.isEmpty(id) || id==0){
+            return new ResponseEntity<>(MensajeResponse.builder()
+                    .mensaje("El id de usuario no es correcto")
+                    .object(null).build(),
+                    HttpStatus.BAD_REQUEST);
+        }
+        var usuario = usuarioRegistroService.findById(id);
+        if (ObjectUtils.isEmpty(usuario)){
+            return new ResponseEntity<>(MensajeResponse.builder()
+                    .mensaje("El id de usuario no se encuentra en el sistema")
+                    .object(null).build(),
+                HttpStatus.NOT_FOUND);
+        }
+        List<Objetivo> listaObjetivos = objetivoService.findListByUserId(id);
+        return new ResponseEntity<>(MensajeResponse.builder()
+                .mensaje("Se devuelve la lista de objetivos relacionados al usuario")
+                .object(listaObjetivos).build(),
+                HttpStatus.OK);
     }
 }

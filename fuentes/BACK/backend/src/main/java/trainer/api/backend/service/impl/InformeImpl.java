@@ -7,6 +7,8 @@ import trainer.api.backend.model.dto.InformeDTO;
 import trainer.api.backend.model.entity.Informe;
 import trainer.api.backend.service.IInforme;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class InformeImpl implements IInforme {
@@ -47,5 +49,10 @@ public class InformeImpl implements IInforme {
     @Override
     public void delete(Informe informe) {
         informeDao.delete(informe);
+    }
+
+    @Override
+    public List<Informe> findListByIdObjetivo(Long id) {
+        return informeDao.findListByObjetivoId(id);
     }
 }

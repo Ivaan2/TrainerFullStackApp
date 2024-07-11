@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import trainer.api.backend.model.dto.InformeDTO;
 import trainer.api.backend.model.payload.MensajeResponse;
 import trainer.api.backend.service.IInforme;
+import trainer.api.backend.service.IObjetivo;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -19,6 +20,7 @@ import java.util.Objects;
 public class InformeController {
 
     private final IInforme informeService;
+    private final IObjetivo objetivoService;
 
     @PostMapping("informe")
     public ResponseEntity<?> create(@RequestBody InformeDTO informeDto){
@@ -98,4 +100,42 @@ public class InformeController {
                 .object(null)
         , HttpStatus.BAD_REQUEST);
     }
+
+    @GetMapping("informes/{id}")
+    public ResponseEntity<?> obtenerListaByIdObjetivo(@PathVariable Long id){
+        if (ObjectUtils.isEmpty(id) || id==0){
+            return new ResponseEntity<>(MensajeResponse.builder()
+                    .mensaje("El id es incorrecto")
+                    .object(null).build(),
+                HttpStatus.BAD_REQUEST);
+        }
+        var objetivoExistente = objetivoService.findById(id);
+        if (ObjectUtils.isEmpty(objetivoExistente)){
+            return new ResponseEntity<>(MensajeResponse.builder()
+                    .mensaje("El objetivo que busca no existe")
+                    .object(null).build(),
+                    HttpStatus.BAD_REQUEST);
+        }
+        var listaInformes = informeService.findListByIdObjetivo(id);
+        return new ResponseEntity<>(MensajeResponse.builder()
+                .mensaje("Se han encontrado una lista de informes")
+                .object(listaInformes).build(),
+            HttpStatus.OK);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

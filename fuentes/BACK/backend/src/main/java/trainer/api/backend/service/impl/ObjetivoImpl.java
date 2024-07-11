@@ -8,12 +8,19 @@ import trainer.api.backend.model.dto.ObjetivoDTO;
 import trainer.api.backend.model.entity.Objetivo;
 import trainer.api.backend.service.IObjetivo;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class ObjetivoImpl implements IObjetivo {
 
     @Autowired
     public IObjetivoDao objetivoDao;
+
+    @Override
+    public List<Objetivo> findListByUserId(Long id) {
+        return objetivoDao.findListByUserId(id);
+    }
 
     @Override
     public Objetivo save(ObjetivoDTO objetivoDto) {

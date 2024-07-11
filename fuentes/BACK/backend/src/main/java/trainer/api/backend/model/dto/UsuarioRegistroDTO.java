@@ -14,22 +14,13 @@ import java.sql.Timestamp;
 public class UsuarioRegistroDTO implements Serializable {
 
     private Long idUsuarioRegistro;
-
     private String nombre;
-
     private String apellido1;
-
     private String apellido2;
-
     private String email;
-
     private String password;
-
-    private String telefono;
-
+    private int edad;
     private Timestamp fechaRegistro;
-
     private Timestamp fechaActualizacion;
-
     private Date fechaBaja;
 }
