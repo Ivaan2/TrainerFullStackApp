@@ -32,4 +32,5 @@ VALUES
 
 SELECT * FROM t_informe;
 
+commit;
 -- DROP TABLE T_INFORME;

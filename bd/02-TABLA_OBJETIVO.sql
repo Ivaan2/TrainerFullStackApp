@@ -22,3 +22,4 @@ INSERT INTO T_OBJETIVO (
 SELECT * FROM t_objetivo WHERE t_objetivo.FK_USUARIO = 4;
 
 -- DROP TABLE T_OBJETIVO;
+commit;

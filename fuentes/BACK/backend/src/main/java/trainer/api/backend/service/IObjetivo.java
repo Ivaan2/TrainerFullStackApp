@@ -14,5 +14,5 @@ public interface IObjetivo {
     public void delete(Objetivo objetivo);
 
     public boolean existsById(Long id);
-    public List<Objetivo> findListByUserId(Long id);
+    public List<Objetivo> findListByUserId(Integer id);
 }

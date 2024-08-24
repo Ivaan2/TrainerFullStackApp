@@ -16,6 +16,7 @@ import trainer.api.backend.service.IUsuarioRegistro;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -40,11 +41,12 @@ public class UsuarioRegistroController {
                     .build()
                     , HttpStatus.CREATED);
         }
-        return new ResponseEntity<>(usuarioRegistroDto, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(MensajeResponse.builder().mensaje("Se ha producido un error al guardar el usuario")
+                .object(null).build(), HttpStatus.BAD_REQUEST);
     }
 
     @PutMapping("/usuarioRegistro/{id}")
-    public ResponseEntity<?> update(@RequestBody UsuarioRegistroDTO usuarioRegistroDto, @PathVariable Long id) {
+    public ResponseEntity<?> update(@RequestBody UsuarioRegistroDTO usuarioRegistroDto, @PathVariable Integer id) {
         UsuarioRegistro usuarioExistente = usuarioRegistroService.findById(id);
 
         if (usuarioExistente != null) {
@@ -80,7 +82,7 @@ public class UsuarioRegistroController {
 
 
     @DeleteMapping("/usuarioRegistro/{id}")
-    public ResponseEntity<?> deleteById(@PathVariable Long id){
+    public ResponseEntity<?> deleteById(@PathVariable Integer id){
         var usuarioRegistro = new UsuarioRegistro();
         try{
             usuarioRegistro = usuarioRegistroService.findById(id);
@@ -92,7 +94,7 @@ public class UsuarioRegistroController {
     }
 
     @GetMapping("/usuarioRegistro/{id}")
-    public ResponseEntity<?> showById(@PathVariable Long id){
+    public ResponseEntity<?> showById(@PathVariable Integer id){
         log.info("** Lanzando GET Method **");
         var usuarioRegistro = usuarioRegistroService.findById(id);
         if (ObjectUtils.isEmpty(usuarioRegistro)) return ResponseEntity.badRequest().build();
@@ -103,7 +105,7 @@ public class UsuarioRegistroController {
     }
 
     @PatchMapping("/usuarioRegistro/{id}")
-    public ResponseEntity<?> updatePassword(@PathVariable Long id, @RequestBody String password){
+    public ResponseEntity<?> updatePassword(@PathVariable Integer id, @RequestBody String password){
         log.info("*** Actualizando contraseña ***");
         if (ObjectUtils.isEmpty(password)){
             return new ResponseEntity<>(MensajeResponse.builder()
@@ -127,7 +129,7 @@ public class UsuarioRegistroController {
     }
 
     @GetMapping("usuarioRegistro/password/{id}")
-    public ResponseEntity<?> getPasswordCodificada(@PathVariable Long id){
+    public ResponseEntity<?> getPasswordCodificada(@PathVariable Integer id){
         if (ObjectUtils.isEmpty(id) || id==0){
             return new ResponseEntity<>(MensajeResponse.builder()
                     .mensaje("El id proporcionado es incorrecto")
@@ -145,5 +147,39 @@ public class UsuarioRegistroController {
                 .mensaje("La contrseña ha sido encontrada correctamente")
                 .object(usuarioExistente.getPassword()).build(),
             HttpStatus.OK);
+    }
+
+    @GetMapping("usuarioRegistro/getAll")
+    public ResponseEntity<?> getAll(){
+        List<UsuarioRegistro> listaUsuarios = usuarioRegistroService.findAll();
+        if (ObjectUtils.isEmpty(listaUsuarios)){
+            return new ResponseEntity<>(MensajeResponse.builder()
+                    .mensaje("No se han encontrado usuarios")
+                    .object(null).build(),
+                HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(MensajeResponse.builder().mensaje("Se han encontrado registros")
+                .object(listaUsuarios).build(), HttpStatus.OK);
+    }
+
+    @GetMapping("usuarioRegistro/login")
+    public ResponseEntity<?> loginByUsernameAndPassword(@RequestParam String email, @RequestBody String password){
+        var usuario = usuarioRegistroService.findByEmail(email);
+        if (ObjectUtils.isEmpty(usuario)){
+            return new ResponseEntity<>(MensajeResponse.builder()
+                    .mensaje("No se ha encontrado el usuario")
+                    .object(null).build(),
+                HttpStatus.NOT_FOUND);
+        }
+        if (passwordEncoder.matches(password, usuario.getPassword())){
+            return new ResponseEntity<>(MensajeResponse.builder()
+                    .mensaje("Usuario logueado correctamente")
+                    .object(usuario).build(),
+                HttpStatus.OK);
+        }
+        return new ResponseEntity<>(MensajeResponse.builder()
+                .mensaje("La contraseña no es correcta")
+                .object(null).build(),
+            HttpStatus.BAD_REQUEST);
     }
 }

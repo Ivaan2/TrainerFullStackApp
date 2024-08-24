@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Timestamp;
 
@@ -18,7 +19,7 @@ public class UsuarioRegistro implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_USUARIO_REGISTRO")
-    private Long idUsuarioRegistro;
+    private Integer idUsuarioRegistro;
 
     @Column(name = "D_NOMBRE", nullable = false, length = 100)
     private String nombre;

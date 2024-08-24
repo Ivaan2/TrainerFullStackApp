@@ -1,5 +1,6 @@
 package trainer.api.backend.model.dto;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.*;
 
 import java.io.Serializable;
@@ -13,7 +14,7 @@ import java.sql.Timestamp;
 @Builder
 public class UsuarioRegistroDTO implements Serializable {
 
-    private Long idUsuarioRegistro;
+    private Integer idUsuarioRegistro;
     private String nombre;
     private String apellido1;
     private String apellido2;

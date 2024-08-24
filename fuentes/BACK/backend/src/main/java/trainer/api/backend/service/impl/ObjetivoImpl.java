@@ -14,11 +14,10 @@ import java.util.List;
 @AllArgsConstructor
 public class ObjetivoImpl implements IObjetivo {
 
-    @Autowired
-    public IObjetivoDao objetivoDao;
+    private final IObjetivoDao objetivoDao;
 
     @Override
-    public List<Objetivo> findListByUserId(Long id) {
+    public List<Objetivo> findListByUserId(Integer id) {
         return objetivoDao.findListByUserId(id);
     }
 

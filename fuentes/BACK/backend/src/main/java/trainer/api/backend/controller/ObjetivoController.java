@@ -134,7 +134,7 @@ public class ObjetivoController {
     }
 
     @GetMapping("objetivos/{id}")
-    public ResponseEntity<?> obtenerListaByIdUsuario(@PathVariable Long id){
+    public ResponseEntity<?> obtenerListaByIdUsuario(@PathVariable Integer id){
         log.info("*** Obteniendolista de objetivos para un usuario ***");
         if (ObjectUtils.isEmpty(id) || id==0){
             return new ResponseEntity<>(MensajeResponse.builder()

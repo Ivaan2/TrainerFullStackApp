@@ -18,5 +18,5 @@ VALUES
 (1, 'L', 5, 2500.00, 150.00, 70.00, 300.00, 2.5);
 
 
-
+commit;
 -- DROP TABLE t_dieta_diaria;
