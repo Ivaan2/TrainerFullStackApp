@@ -2,6 +2,7 @@ package trainer.api.backend.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import trainer.api.backend.model.entity.enums.DiaSemana;
 
 @Entity
 @Getter

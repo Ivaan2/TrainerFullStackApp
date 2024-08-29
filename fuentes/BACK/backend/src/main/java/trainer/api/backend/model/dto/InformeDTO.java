@@ -1,8 +1,8 @@
 package trainer.api.backend.model.dto;
 
 import lombok.*;
-import trainer.api.backend.model.entity.NivelActividad;
-import trainer.api.backend.model.entity.Sexo;
+import trainer.api.backend.model.entity.enums.NivelActividad;
+import trainer.api.backend.model.entity.enums.Sexo;
 
 import java.sql.Timestamp;
 

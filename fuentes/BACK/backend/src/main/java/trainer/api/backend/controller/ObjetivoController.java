@@ -93,9 +93,14 @@ public class ObjetivoController {
             Objetivo objetivoDelete = objetivoService.findById(id);
             if(ObjectUtils.isNotEmpty(objetivoDelete)){
                 objetivoService.delete(objetivoDelete);
-                return new ResponseEntity<>(objetivoDelete, HttpStatus.OK);
+                return new ResponseEntity<>(MensajeResponse.builder()
+                        .mensaje("Registro eliminado correctamente")
+                        .object(objetivoDelete).build()
+                        , HttpStatus.OK);
             }
-            return new ResponseEntity<>(objetivoDelete, HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(MensajeResponse.builder()
+                    .mensaje("No existe ese registro en la base de datos")
+                    .object(null).build(), HttpStatus.NO_CONTENT);
         } catch (DataAccessException exDt) {
             return new ResponseEntity<>(
                     MensajeResponse.builder()

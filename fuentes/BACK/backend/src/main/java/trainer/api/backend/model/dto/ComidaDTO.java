@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import trainer.api.backend.model.entity.DietaDiaria;
-import trainer.api.backend.model.entity.NombreComida;
+import trainer.api.backend.model.entity.enums.NombreComida;
 
 import java.time.LocalTime;
 

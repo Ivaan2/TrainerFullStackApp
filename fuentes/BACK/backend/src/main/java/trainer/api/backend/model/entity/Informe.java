@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import trainer.api.backend.model.entity.enums.NivelActividad;
+import trainer.api.backend.model.entity.enums.SeguimientoDieta;
+import trainer.api.backend.model.entity.enums.Sexo;
 
 import java.sql.Timestamp;
 
@@ -72,6 +75,13 @@ public class Informe {
     @Enumerated(EnumType.STRING)
     @Column(name = "D_NIVEL_ACTIVIDAD", nullable = false)
     private NivelActividad nivelActividad;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "D_SEGUIMIENTO_DIETA", nullable = false)
+    private SeguimientoDieta seguimientoDieta;
+
+    @Column(name = "N_DIAS_ENTRENO", nullable = false)
+    private Integer diasEntreno;
 
     @Column(name = "N_IMC")
     private Double imc;

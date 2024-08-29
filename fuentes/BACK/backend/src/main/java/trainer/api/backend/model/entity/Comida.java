@@ -2,6 +2,7 @@ package trainer.api.backend.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import trainer.api.backend.model.entity.enums.NombreComida;
 
 import java.time.LocalTime;
 
@@ -24,7 +25,10 @@ public class Comida {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "D_NOMBRE", nullable = false)
-    private NombreComida nombre;
+    private NombreComida tipoComida;
+
+    @Column(name = "D_NOMBRE_PLATO", nullable = false)
+    private String nombrePlato;
 
     @Column(name = "F_HORA", nullable = false)
     private LocalTime hora;

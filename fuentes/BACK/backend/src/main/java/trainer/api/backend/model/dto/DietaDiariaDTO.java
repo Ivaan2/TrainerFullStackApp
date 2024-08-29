@@ -1,7 +1,7 @@
 package trainer.api.backend.model.dto;
 
 import lombok.*;
-import trainer.api.backend.model.entity.DiaSemana;
+import trainer.api.backend.model.entity.enums.DiaSemana;
 
 @Getter
 @Setter
