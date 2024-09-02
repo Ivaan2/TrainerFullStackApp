@@ -24,7 +24,7 @@ public class Objetivo implements Serializable {
     @Column(name = "D_DESCRIPCION", nullable = false, length = 400)
     private String descripcion;
 
-    @Column(name = "F_FECHA_REGISTRO", nullable = false)
+    @Column(name = "F_FECHA_INICIO", nullable = false)
     private Timestamp fechaRegistro;
 
     @Column(name = "F_FECHA_FIN", nullable = false)

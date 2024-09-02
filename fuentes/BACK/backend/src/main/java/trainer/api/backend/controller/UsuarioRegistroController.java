@@ -72,6 +72,10 @@ public class UsuarioRegistroController {
         usuarioExistente.setApellido1(usuarioRegistroDto.getApellido1());
         usuarioExistente.setApellido2(usuarioRegistroDto.getApellido2());
         usuarioExistente.setEmail(usuarioRegistroDto.getEmail());
+        usuarioExistente.setNombreUsuario(usuarioRegistroDto.getNombreUsuario());
+        usuarioExistente.setPais(usuarioRegistroDto.getPais());
+        usuarioExistente.setSexo(usuarioRegistroDto.getSexo());
+        usuarioExistente.setRutaAvatar(usuarioRegistroDto.getRutaAvatar());
         usuarioExistente.setFechaActualizacion(new Timestamp(new Date().getTime()));
         usuarioExistente.setPassword(passwordEncoder.encode(usuarioRegistroDto.getPassword()));
         usuarioExistente.setEdad(usuarioRegistroDto.getEdad());

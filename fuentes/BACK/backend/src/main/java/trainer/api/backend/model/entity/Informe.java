@@ -60,7 +60,7 @@ public class Informe {
     @Column(name = "N_ANTEBRAZO")
     private Double antebrazo;
 
-    @Column(name = "N_BICEP")
+    @Column(name = "N_BICEPS")
     private Double biceps;
 
     @Column(name = "N_GLUTEO")

@@ -61,7 +61,7 @@ public class ComidaController {
         Comida entity = new Comida();
         entity.setId(dto.getId());
         entity.setDietaDiaria(dto.getDietaDiaria());
-        entity.setNombre(dto.getNombre());
+        entity.setTipoComida(dto.getNombre());
         entity.setHora(dto.getHora());
         entity.setAporteCalorico(dto.getAporteCalorico());
         entity.setAporteProteico(dto.getAporteProteico());

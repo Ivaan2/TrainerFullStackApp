@@ -1,7 +1,9 @@
 package trainer.api.backend.model.dto;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.*;
+import trainer.api.backend.model.entity.enums.Sexo;
 
 import java.io.Serializable;
 import java.sql.Date;
@@ -21,6 +23,10 @@ public class UsuarioRegistroDTO implements Serializable {
     private String email;
     private String password;
     private int edad;
+    private String nombreUsuario;
+    private String rutaAvatar;
+    private String pais;
+    private Sexo sexo;
     private Timestamp fechaRegistro;
     private Timestamp fechaActualizacion;
     private Date fechaBaja;

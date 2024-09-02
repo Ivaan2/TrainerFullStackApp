@@ -51,7 +51,7 @@ public class UsuarioRegistro implements Serializable {
     @Column(name = "D_SEXO")
     private Sexo sexo;
 
-    @Column(name = "F_FECHA_REGISTRO", nullable = false)
+    @Column(name = "F_FECHA_REGISTRO")
     private Timestamp fechaRegistro;
 
     @Column(name = "F_FECHA_ACTUALIZACION")
