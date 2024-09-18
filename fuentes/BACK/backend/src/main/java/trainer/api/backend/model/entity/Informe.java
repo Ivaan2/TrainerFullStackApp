@@ -92,7 +92,4 @@ public class Informe {
     @Column(name = "F_FECHA_REGISTRO", nullable = false)
     private Timestamp fechaRegistro;
 
-    /*@Column(name = "ID_OBJETIVO", nullable = false)
-    private Long objetivo;*/
-
 }

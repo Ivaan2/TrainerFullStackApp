@@ -2,8 +2,8 @@
 CREATE TABLE T_OBJETIVO(
 	ID_OBJETIVO BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT 'Identificador del objetivo físico de un usuario',
     D_DESCRIPCION VARCHAR(400) NOT NULL COMMENT 'Descripción del objetivo establecido',
-    F_FECHA_REGISTRO TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha de generación del objetivo marcado',
-    F_FECHA_FIN TIMESTAMP NOT NULL COMMENT 'Fecha establecida para la finalización del período',
+    F_FECHA_INICIO TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha de inicio del objetivo marcado',
+    F_FECHA_FIN TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha establecida para la finalización del período',
     B_CUMPLIDO BOOLEAN DEFAULT NULL COMMENT 'Marca si el objetivo ha sido cumplido tras la finalización del período. Opcional',
     FK_USUARIO BIGINT NOT NULL COMMENT 'Identificador FK de la tabla usario registrado.',
     CONSTRAINT FK_OBJETIVO_USUARIO FOREIGN KEY (FK_USUARIO) REFERENCES T_USUARIO_REGISTRO(ID_USUARIO_REGISTRO)

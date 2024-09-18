@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import trainer.api.backend.model.dto.LoginRequestDto;
 import trainer.api.backend.model.dto.UsuarioRegistroDTO;
 import trainer.api.backend.model.entity.UsuarioRegistro;
 import trainer.api.backend.model.payload.MensajeResponse;
@@ -17,10 +18,12 @@ import trainer.api.backend.service.IUsuarioRegistro;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @RestController
 @AllArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api/v1")
 public class UsuarioRegistroController {
 
@@ -68,20 +71,55 @@ public class UsuarioRegistroController {
 
     private static void usuarioDTOToEntity(UsuarioRegistroDTO usuarioRegistroDto, UsuarioRegistro usuarioExistente) {
         log.info("Parseando DTO a Entidad");
-        usuarioExistente.setNombre(usuarioRegistroDto.getNombre());
-        usuarioExistente.setApellido1(usuarioRegistroDto.getApellido1());
-        usuarioExistente.setApellido2(usuarioRegistroDto.getApellido2());
-        usuarioExistente.setEmail(usuarioRegistroDto.getEmail());
-        usuarioExistente.setNombreUsuario(usuarioRegistroDto.getNombreUsuario());
-        usuarioExistente.setPais(usuarioRegistroDto.getPais());
-        usuarioExistente.setSexo(usuarioRegistroDto.getSexo());
-        usuarioExistente.setRutaAvatar(usuarioRegistroDto.getRutaAvatar());
+        if (usuarioRegistroDto.getNombre() != null) {
+            usuarioExistente.setNombre(usuarioRegistroDto.getNombre());
+        }
+
+        if (usuarioRegistroDto.getApellido1() != null) {
+            usuarioExistente.setApellido1(usuarioRegistroDto.getApellido1());
+        }
+
+        if (usuarioRegistroDto.getApellido2() != null) {
+            usuarioExistente.setApellido2(usuarioRegistroDto.getApellido2());
+        }
+
+        if (usuarioRegistroDto.getEmail() != null) {
+            usuarioExistente.setEmail(usuarioRegistroDto.getEmail());
+        }
+
+        if (usuarioRegistroDto.getNombreUsuario() != null) {
+            usuarioExistente.setNombreUsuario(usuarioRegistroDto.getNombreUsuario());
+        }
+
+        if (usuarioRegistroDto.getPais() != null) {
+            usuarioExistente.setPais(usuarioRegistroDto.getPais());
+        }
+
+        if (usuarioRegistroDto.getSexo() != null) {
+            usuarioExistente.setSexo(usuarioRegistroDto.getSexo());
+        }
+
+        if (usuarioRegistroDto.getRutaAvatar() != null) {
+            usuarioExistente.setRutaAvatar(usuarioRegistroDto.getRutaAvatar());
+        }
+
+// Fecha de actualización siempre se debe setear a la fecha actual
         usuarioExistente.setFechaActualizacion(new Timestamp(new Date().getTime()));
-        usuarioExistente.setPassword(passwordEncoder.encode(usuarioRegistroDto.getPassword()));
-        usuarioExistente.setEdad(usuarioRegistroDto.getEdad());
+
+// Codificar y setear la contraseña solo si no es nula
+        if (usuarioRegistroDto.getPassword() != null) {
+            usuarioExistente.setPassword(passwordEncoder.encode(usuarioRegistroDto.getPassword()));
+        }
+
+        if (!Objects.isNull(usuarioRegistroDto.getEdad())) {
+            usuarioExistente.setEdad(usuarioRegistroDto.getEdad());
+        }
+
+// Solo establecer las fechas si realmente son necesarias
         usuarioExistente.setFechaRegistro(new Timestamp(new Date().getTime()));
-        usuarioExistente.setFechaActualizacion(null);
-        usuarioExistente.setFechaBaja(null);
+        usuarioExistente.setFechaActualizacion(null); // Si tienes lógica para esto
+        usuarioExistente.setFechaBaja(null); // Si tienes lógica para esto también
+
     }
 
 
@@ -92,7 +130,7 @@ public class UsuarioRegistroController {
             usuarioRegistro = usuarioRegistroService.findById(id);
             usuarioRegistroService.delete(usuarioRegistro);
         }catch(DataAccessException e){
-            System.out.println("No se ha podido encontrar el usuario con id: "+ id);
+            log.info("No se ha podido encontrar el usuario con id: "+ id);
         }
         return new ResponseEntity<>(usuarioRegistro, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -166,8 +204,10 @@ public class UsuarioRegistroController {
                 .object(listaUsuarios).build(), HttpStatus.OK);
     }
 
-    @GetMapping("usuarioRegistro/login")
-    public ResponseEntity<?> loginByUsernameAndPassword(@RequestParam String email, @RequestBody String password){
+    @PostMapping("usuarioRegistro/login")
+    public ResponseEntity<?> loginByUsernameAndPassword(@RequestBody LoginRequestDto loginRequestDto){
+        String email = loginRequestDto.getEmail();
+        String password = loginRequestDto.getPassword();
         var usuario = usuarioRegistroService.findByEmail(email);
         if (ObjectUtils.isEmpty(usuario)){
             return new ResponseEntity<>(MensajeResponse.builder()

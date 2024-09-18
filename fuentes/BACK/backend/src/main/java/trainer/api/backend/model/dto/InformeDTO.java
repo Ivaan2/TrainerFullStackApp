@@ -2,6 +2,7 @@ package trainer.api.backend.model.dto;
 
 import lombok.*;
 import trainer.api.backend.model.entity.enums.NivelActividad;
+import trainer.api.backend.model.entity.enums.SeguimientoDieta;
 import trainer.api.backend.model.entity.enums.Sexo;
 
 import java.sql.Timestamp;
@@ -49,6 +50,10 @@ public class InformeDTO {
     private Double porcentajeMusculo;
 
     private NivelActividad nivelActividad;
+
+    private int diasEntreno;
+
+    private SeguimientoDieta seguimientoDieta;
 
     private Double imc;
 

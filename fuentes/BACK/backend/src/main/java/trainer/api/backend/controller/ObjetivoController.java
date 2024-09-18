@@ -160,4 +160,41 @@ public class ObjetivoController {
                 .object(listaObjetivos).build(),
                 HttpStatus.OK);
     }
+
+    @GetMapping("objetivo/user/{idUsuario}")
+    public ResponseEntity<?> obtenerUltimoObjetivo(@PathVariable Integer idUsuario){
+        log.info("*** Obteniendo el último objetivo del usuario ***");
+        if (ObjectUtils.isEmpty(idUsuario) || idUsuario==0){
+            return new ResponseEntity<>(MensajeResponse.builder()
+                .mensaje("El id de usuario no es correcto")
+                .object(null).build(),
+                HttpStatus.BAD_REQUEST);
+        }
+        var usuario = usuarioRegistroService.findById(idUsuario);
+        if (ObjectUtils.isEmpty(usuario)){
+            return new ResponseEntity<>(MensajeResponse.builder()
+                .mensaje("El id de usuario no se encuentra en el sistema")
+                .object(null).build(),
+                HttpStatus.NOT_FOUND);
+        }
+        List<Objetivo> listaDeObjetivos = objetivoService.findListByUserId(idUsuario);
+        if (listaDeObjetivos.isEmpty()){
+            return new ResponseEntity<>(MensajeResponse.builder()
+                .mensaje("El usuario no tiene objetivos registrados")
+                .object(null).build(),
+                HttpStatus.NO_CONTENT);
+        }
+        Objetivo objetivo = listaDeObjetivos.get(0);
+        return new ResponseEntity<>(MensajeResponse.builder()
+            .mensaje("Se devuelve el último objetivo relacionado al usuario")
+            .object(ObjetivoDTO.builder()
+                .cumplido(objetivo.getCumplido())
+                .descripcion(objetivo.getDescripcion())
+                .fechaFin(objetivo.getFechaFin())
+                .fechaRegistro(objetivo.getFechaRegistro())
+                .id(objetivo.getId())
+                .usuarioId(objetivo.getUsuarioId())
+                .build()).build(),
+            HttpStatus.OK);
+    }
 }
