@@ -3,48 +3,75 @@ package trainer.api.backend.service.impl;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import trainer.api.backend.model.dao.IInformeDao;
+import trainer.api.backend.model.dao.IObjetivoDao;
+import trainer.api.backend.model.dao.IUsuarioRegistroDao;
 import trainer.api.backend.model.dto.InformeDTO;
 import trainer.api.backend.model.entity.Informe;
+import trainer.api.backend.model.entity.Objetivo;
+import trainer.api.backend.model.entity.UsuarioRegistro;
 import trainer.api.backend.model.entity.enums.NivelActividad;
+import trainer.api.backend.model.entity.enums.Sexo;
 import trainer.api.backend.service.IInforme;
 
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 public class InformeImpl implements IInforme {
 
     public IInformeDao informeDao;
+    private IObjetivoDao objetivoDaoService;
+    private IUsuarioRegistroDao usuarioRegistroDaoService;
 
     @Override
     public Informe save(InformeDTO informeDto) {
+        Optional<Objetivo> objetivo = objetivoDaoService.findById(informeDto.getObjetivoId());
+        var objetivoObj = objetivo.orElse(null);
+        UsuarioRegistro usuario = usuarioRegistroDaoService.findById(Math.toIntExact(objetivoObj.getUsuarioId())).get();
+
+        int edad = usuario.getEdad();
+        Sexo sexo = usuario.getSexo();
         Double peso = informeDto.getPeso();
         int altura = informeDto.getAltura();
         Informe informe = Informe.builder()
-                .altura(informeDto.getAltura())
-                .edad(informeDto.getEdad())
+                .altura(altura)
                 .abdomen(informeDto.getAbdomen())
                 .imc(calculateIMC(peso, altura))
                 .cadera(informeDto.getCadera())
                 .biceps(informeDto.getBiceps())
                 .cuadriceps(informeDto.getCuadriceps())
                 .gemelos(informeDto.getGemelos())
-                .fechaRegistro(informeDto.getFechaRegistro())
+                .sexo(sexo)
+                .edad(edad)
+                .fechaRegistro(dateToTimestamp(informeDto.getFechaRegistro()))
                 .pecho(informeDto.getPecho())
-                .peso(informeDto.getPeso())
+                .peso(peso)
                 .gluteos(informeDto.getGluteos())
                 .hombros(informeDto.getHombros())
                 .antebrazo(informeDto.getAntebrazo())
                 .diasEntreno(informeDto.getDiasEntreno())
                 .seguimientoDieta(informeDto.getSeguimientoDieta())
-                .tmb(calculateTMB(peso, altura, informeDto.getEdad(), informeDto.getSexo().name(), informeDto.getDiasEntreno()))
                 .id(informeDto.getId())
-                .sexo(informeDto.getSexo())
+                .tmb(calculateTMB(peso, altura, edad, sexo.toString(), informeDto.getDiasEntreno()))
                 .nivelActividad(informeDto.getNivelActividad())
                 .objetivoId(informeDto.getObjetivoId())
                 .porcentajeGraso(informeDto.getPorcentajeGraso())
                 .porcentajeMusculo(informeDto.getPorcentajeMusculo()).build();
         return informeDao.save(informe);
+    }
+
+    private static Timestamp dateToTimestamp(String fecha) {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+        LocalDate localDate = LocalDate.parse(fecha, dtf);
+        LocalDateTime localDateTime = localDate.atStartOfDay();
+
+        // Convertir LocalDateTime a Timestamp
+        return Timestamp.valueOf(localDateTime);
     }
 
     // Tasa Metabolica Basal

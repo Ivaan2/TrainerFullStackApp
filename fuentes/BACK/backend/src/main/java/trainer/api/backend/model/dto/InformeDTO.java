@@ -59,5 +59,5 @@ public class InformeDTO {
 
     private Double tmb;
 
-    private Timestamp fechaRegistro;
+    private String fechaRegistro;
 }

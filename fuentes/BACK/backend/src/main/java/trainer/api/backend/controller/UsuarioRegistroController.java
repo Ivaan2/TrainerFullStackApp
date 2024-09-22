@@ -3,6 +3,7 @@ package trainer.api.backend.controller;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,10 @@ import trainer.api.backend.service.IUsuarioRegistro;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+
+import static org.apache.logging.log4j.message.MapMessage.MapFormat.JSON;
 
 @Slf4j
 @RestController
@@ -226,4 +230,30 @@ public class UsuarioRegistroController {
                 .object(null).build(),
             HttpStatus.BAD_REQUEST);
     }
+
+    @PatchMapping("usuarioRegistro/cambiarAvatar/{id}")
+    public ResponseEntity<?> cambiarAvatar(@PathVariable Integer id, @RequestBody Map<String, String> payload) {
+        var usuario = usuarioRegistroService.findById(id);
+
+        if (ObjectUtils.isEmpty(usuario)) {
+            return new ResponseEntity<>(MensajeResponse.builder()
+                    .mensaje("No se ha encontrado el usuario")
+                    .object(null).build(),
+                    HttpStatus.NOT_FOUND);
+        }
+        // Extraer el valor de 'rutaAvatar' del payload
+        String rutaAvatar = payload.get("rutaAvatar");
+
+        // Setear el avatar en el usuario
+        usuario.setRutaAvatar(rutaAvatar);
+
+        // Guardar el usuario actualizado
+        usuario = usuarioRegistroService.save(usuario);
+
+        return new ResponseEntity<>(MensajeResponse.builder()
+                .mensaje("Se ha actualizado el avatar correctamente")
+                .object(usuario).build(),
+                HttpStatus.OK);
+    }
+
 }

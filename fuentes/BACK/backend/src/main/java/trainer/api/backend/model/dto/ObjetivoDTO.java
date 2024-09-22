@@ -3,6 +3,7 @@ package trainer.api.backend.model.dto;
 import lombok.*;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,11 +17,13 @@ public class ObjetivoDTO {
 
     private String descripcion;
 
-    private Timestamp fechaRegistro;
+    private String fechaRegistro;
 
-    private Timestamp fechaFin;
+    private String fechaFin;
 
     private Boolean cumplido;
 
     private Long usuarioId;
+
+    private List<InformeDTO> informes;
 }

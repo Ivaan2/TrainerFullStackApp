@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface IObjetivo {
 
+    Objetivo findLastByUserId(Integer id);
+
     public Objetivo save(ObjetivoDTO objetivoDto);
 
     public Objetivo findById(Long id);

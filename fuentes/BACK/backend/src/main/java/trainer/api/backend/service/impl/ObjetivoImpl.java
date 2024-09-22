@@ -1,13 +1,17 @@
 package trainer.api.backend.service.impl;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import trainer.api.backend.model.dao.IObjetivoDao;
 import trainer.api.backend.model.dto.ObjetivoDTO;
 import trainer.api.backend.model.entity.Objetivo;
 import trainer.api.backend.service.IObjetivo;
 
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -22,16 +26,31 @@ public class ObjetivoImpl implements IObjetivo {
     }
 
     @Override
+    public Objetivo findLastByUserId(Integer id) {
+        return objetivoDao.findLastByUserId(id, PageRequest.of(0, 1)).get(0);
+
+    }
+
+    @Override
     public Objetivo save(ObjetivoDTO objetivoDto) {
         Objetivo objetivo = Objetivo.builder()
                 .cumplido(objetivoDto.getCumplido())
                 .descripcion(objetivoDto.getDescripcion())
-                .fechaFin(objetivoDto.getFechaFin())
-                .fechaRegistro(objetivoDto.getFechaRegistro())
+                .fechaFin(dateToTimestamp(objetivoDto.getFechaFin()))
+                .fechaRegistro(dateToTimestamp(objetivoDto.getFechaRegistro()))
                 .id(objetivoDto.getId())
                 .usuarioId(objetivoDto.getUsuarioId())
                 .build();
         return objetivoDao.save(objetivo);
+    }
+
+    private static Timestamp dateToTimestamp(String fecha) {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(fecha, dtf);
+        LocalDateTime localDateTime = localDate.atStartOfDay();
+
+        // Convertir LocalDateTime a Timestamp
+        return Timestamp.valueOf(localDateTime);
     }
 
     @Override
