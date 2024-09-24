@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import trainer.api.backend.model.dto.LoginRequestDto;
+import trainer.api.backend.model.dto.UpdatePasswordDto;
 import trainer.api.backend.model.dto.UsuarioRegistroDTO;
 import trainer.api.backend.model.entity.UsuarioRegistro;
 import trainer.api.backend.model.payload.MensajeResponse;
@@ -115,8 +116,8 @@ public class UsuarioRegistroController {
             usuarioExistente.setPassword(passwordEncoder.encode(usuarioRegistroDto.getPassword()));
         }
 
-        if (!Objects.isNull(usuarioRegistroDto.getEdad())) {
-            usuarioExistente.setEdad(usuarioRegistroDto.getEdad());
+        if (!Objects.isNull(usuarioRegistroDto.getFechaNacimiento())) {
+            usuarioExistente.setFechaNacimiento(usuarioRegistroDto.getFechaNacimiento());
         }
 
 // Solo establecer las fechas si realmente son necesarias
@@ -151,28 +152,51 @@ public class UsuarioRegistroController {
     }
 
     @PatchMapping("/usuarioRegistro/{id}")
-    public ResponseEntity<?> updatePassword(@PathVariable Integer id, @RequestBody String password){
+    public ResponseEntity<?> updatePassword(@PathVariable Integer id, @RequestBody UpdatePasswordDto updatePasswordDto) {
+        String newPassword = updatePasswordDto.getNewPassword();
+        String oldPassword = updatePasswordDto.getOldPassword();
+
         log.info("*** Actualizando contraseña ***");
-        if (ObjectUtils.isEmpty(password)){
+
+        // Validar que la nueva contraseña no esté vacía
+        if (ObjectUtils.isEmpty(newPassword)) {
             return new ResponseEntity<>(MensajeResponse.builder()
-                    .mensaje("La contraseña no es válida")
+                    .mensaje("La nueva contraseña no es válida")
                     .object(null).build(),
-                HttpStatus.BAD_REQUEST);
+                    HttpStatus.BAD_REQUEST);
         }
+
+        // Buscar el usuario por ID
         var usuarioExistente = usuarioRegistroService.findById(id);
-        if (ObjectUtils.isEmpty(usuarioExistente)){
+        if (ObjectUtils.isEmpty(usuarioExistente)) {
             return new ResponseEntity<>(MensajeResponse.builder()
                     .mensaje("No existe ese usuario")
                     .object(null).build(),
-                HttpStatus.BAD_REQUEST);
+                    HttpStatus.BAD_REQUEST);
         }
-        usuarioExistente.setPassword(passwordEncoder.encode(password));
+
+        // Obtener la contraseña antigua encriptada del usuario
+        String passwordAntiguoExistenteCodificada = usuarioExistente.getPassword();
+
+        // Comparar la contraseña antigua proporcionada con la almacenada
+        if (!passwordEncoder.matches(oldPassword, passwordAntiguoExistenteCodificada)) {
+            return new ResponseEntity<>(MensajeResponse.builder()
+                    .mensaje("La contraseña antigua no es correcta")
+                    .object(null).build(),
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        // Codificar y actualizar la nueva contraseña
+        usuarioExistente.setPassword(passwordEncoder.encode(newPassword));
         usuarioRegistroService.save(usuarioExistente);
+
+        // Respuesta de éxito
         return new ResponseEntity<>(MensajeResponse.builder()
                 .mensaje("Se ha actualizado la contraseña correctamente")
                 .object(usuarioExistente).build(),
                 HttpStatus.OK);
     }
+
 
     @GetMapping("usuarioRegistro/password/{id}")
     public ResponseEntity<?> getPasswordCodificada(@PathVariable Integer id){
@@ -252,6 +276,37 @@ public class UsuarioRegistroController {
 
         return new ResponseEntity<>(MensajeResponse.builder()
                 .mensaje("Se ha actualizado el avatar correctamente")
+                .object(usuario).build(),
+                HttpStatus.OK);
+    }
+
+    @PatchMapping("usuarioRegistro/cambiarEmail/{id}")
+    public ResponseEntity<?> cambiarEmail(@PathVariable Integer id, @RequestBody Map<String, String> payload) {
+        var usuario = usuarioRegistroService.findById(id);
+
+        if (ObjectUtils.isEmpty(usuario)) {
+            return new ResponseEntity<>(MensajeResponse.builder()
+                    .mensaje("No se ha encontrado el usuario")
+                    .object(null).build(),
+                    HttpStatus.NOT_FOUND);
+        }
+        // Extraer el valor de 'email' del payload
+        String email = payload.get("email");
+        var usuarioIncognita = usuarioRegistroService.findByEmail(email);
+        if (ObjectUtils.isNotEmpty(usuarioIncognita)){
+            return new ResponseEntity<>(MensajeResponse.builder()
+                    .mensaje("El email ya está en uso")
+                    .object(null).build(),
+                HttpStatus.IM_USED);
+        }
+        // Setear el email en el usuario
+        usuario.setEmail(email);
+
+        // Guardar el usuario actualizado
+        usuario = usuarioRegistroService.save(usuario);
+
+        return new ResponseEntity<>(MensajeResponse.builder()
+                .mensaje("Se ha actualizado el email correctamente")
                 .object(usuario).build(),
                 HttpStatus.OK);
     }

@@ -42,8 +42,8 @@ public class UsuarioRegistro implements Serializable {
     @Column(name = "D_AVATAR")
     private String rutaAvatar;
 
-    @Column(name = "N_EDAD")
-    private Integer edad;
+    @Column(name = "F_FECHA_NACIMIENTO")
+    private Date fechaNacimiento;
 
     @Column(name = "D_PAIS", nullable = false, length = 100)
     private String pais;

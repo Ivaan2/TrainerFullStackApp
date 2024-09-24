@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @AllArgsConstructor
@@ -27,7 +28,8 @@ public class ObjetivoImpl implements IObjetivo {
 
     @Override
     public Objetivo findLastByUserId(Integer id) {
-        return objetivoDao.findLastByUserId(id, PageRequest.of(0, 1)).get(0);
+        List<Objetivo> ultimoObjetivo = objetivoDao.findLastByUserId(id, PageRequest.of(0, 1));
+        return (Objects.isNull(ultimoObjetivo) || ultimoObjetivo.isEmpty()) ? null : ultimoObjetivo.get(0);
 
     }
 

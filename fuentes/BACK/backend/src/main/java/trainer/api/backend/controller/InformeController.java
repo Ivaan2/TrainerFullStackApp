@@ -14,6 +14,7 @@ import trainer.api.backend.service.IInforme;
 import trainer.api.backend.service.IObjetivo;
 import trainer.api.backend.service.IUsuarioRegistro;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -32,12 +33,14 @@ public class InformeController {
     public ResponseEntity<?> create(@RequestBody InformeDTO informeDto) {
         if (ObjectUtils.isNotEmpty(informeDto)) {
             // TODO: Fix this save method
-            var informe = informeService.save(informeDto);
-            Objetivo objetivo = objetivoService.findById(informe.getObjetivoId());
+            Objetivo objetivo = objetivoService.findById(informeDto.getObjetivoId());
             UsuarioRegistro usuario = usuarioRegistroService.findById(Math.toIntExact(objetivo.getUsuarioId()));
+            Date fechaNacimiento = usuario.getFechaNacimiento();
 
-            int edad = usuario.getEdad();
+            int edad = LocalDateTime.now().getYear() - fechaNacimiento.toLocalDate().getYear();
             Sexo sexo = usuario.getSexo();
+
+            var informe = informeService.save(informeDto);
             return new ResponseEntity<>(MensajeResponse.builder()
                     .mensaje("Se ha creado el informe con éxito")
                     .object(InformeDTO.builder()

@@ -11,11 +11,13 @@ import trainer.api.backend.model.dto.InformeDTO;
 import trainer.api.backend.model.dto.ObjetivoDTO;
 import trainer.api.backend.model.entity.Informe;
 import trainer.api.backend.model.entity.Objetivo;
+import trainer.api.backend.model.entity.UsuarioRegistro;
 import trainer.api.backend.model.payload.MensajeResponse;
 import trainer.api.backend.service.IInforme;
 import trainer.api.backend.service.IObjetivo;
 import trainer.api.backend.service.IUsuarioRegistro;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -195,6 +197,12 @@ public class ObjetivoController {
                     HttpStatus.NOT_FOUND);
         }
         Objetivo ultimoObjetivo = objetivoService.findLastByUserId(idUsuario);
+        if(ObjectUtils.isEmpty(ultimoObjetivo)) {
+            return new ResponseEntity<>(MensajeResponse.builder()
+                    .mensaje("No se encontraron objetivos relacionados al usuario")
+                    .object(null).build(),
+                    HttpStatus.NO_CONTENT);
+        }
 
         List<InformeDTO> informesDto = listaInformesToDTO(ultimoObjetivo.getId());
         return new ResponseEntity<>(MensajeResponse.builder()
@@ -213,11 +221,10 @@ public class ObjetivoController {
 
     private List<InformeDTO> listaInformesToDTO(Long objetivoId) {
         List<Informe> listaInformes = informeService.findListByIdObjetivo(objetivoId);
+
         return listaInformes.stream().map(informe -> InformeDTO.builder()
                 .id(informe.getId())
                 .objetivoId(objetivoId)
-                .edad(informe.getEdad())
-                .sexo(informe.getSexo())
                 .altura(informe.getAltura())
                 .peso(informe.getPeso())
                 .cadera(informe.getCadera())

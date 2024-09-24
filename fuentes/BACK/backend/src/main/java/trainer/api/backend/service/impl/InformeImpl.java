@@ -13,6 +13,7 @@ import trainer.api.backend.model.entity.enums.NivelActividad;
 import trainer.api.backend.model.entity.enums.Sexo;
 import trainer.api.backend.service.IInforme;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,7 +35,8 @@ public class InformeImpl implements IInforme {
         var objetivoObj = objetivo.orElse(null);
         UsuarioRegistro usuario = usuarioRegistroDaoService.findById(Math.toIntExact(objetivoObj.getUsuarioId())).get();
 
-        int edad = usuario.getEdad();
+        Date fechaNacimiento = usuario.getFechaNacimiento();
+        int edad = LocalDateTime.now().getYear() - fechaNacimiento.toLocalDate().getYear();
         Sexo sexo = usuario.getSexo();
         Double peso = informeDto.getPeso();
         int altura = informeDto.getAltura();
