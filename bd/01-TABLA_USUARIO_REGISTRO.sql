@@ -10,7 +10,7 @@ CREATE TABLE T_USUARIO_REGISTRO(
     D_AVATAR VARCHAR(255) COMMENT 'Ruta del avatar del perfil',
     D_PAIS VARCHAR(255) COMMENT 'País de origen del usuario',
     D_SEXO ENUM('HOMBRE', 'MUJER') COMMENT 'Sexo del usuario',
-    N_EDAD DECIMAL(3,0) COMMENT 'Edad del usuario',
+    F_FECHA_NACIMIENTO DATE NOT NULL COMMENT 'Fecha de nacimiento del usuario',
     F_FECHA_REGISTRO TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha y hora a la que el usuario se registra, con marca de tiempo automática',
     F_FECHA_ACTUALIZACION TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT 'Fecha de la última actualización del registro, se actualiza automáticamente',
     F_FECHA_BAJA DATE COMMENT 'Fecha en la que se da de baja el usuario, opcional'
