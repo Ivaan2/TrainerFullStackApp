@@ -2,7 +2,6 @@ package trainer.api.backend.model.dto;
 
 import lombok.*;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 @Getter
@@ -23,7 +22,7 @@ public class ObjetivoDTO {
 
     private Boolean cumplido;
 
-    private Long usuarioId;
+    private UsuarioRegistroDTO usuario;
 
     private List<InformeDTO> informes;
 }

@@ -19,10 +19,6 @@ public class Comida {
     @Column(name = "ID_COMIDA")
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "FK_DIETA", nullable = false)
-    private DietaDiaria dietaDiaria;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "D_NOMBRE", nullable = false)
     private NombreComida tipoComida;
@@ -45,7 +41,7 @@ public class Comida {
     @Column(name = "N_APORTE_CARB", nullable = false)
     private Double aporteCarbohidratos;
 
-    /*@ManyToOne
-    @Column(name = "ID_DIETA")
-    private DietaDiaria dietaDiaria;*/
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FK_DIETA", nullable = false)
+    private DietaDiaria dieta;
 }

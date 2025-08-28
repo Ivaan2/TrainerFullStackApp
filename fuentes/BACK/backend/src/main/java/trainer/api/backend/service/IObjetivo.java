@@ -7,15 +7,15 @@ import java.util.List;
 
 public interface IObjetivo {
 
-    Objetivo findLastByUserId(Integer id);
+    ObjetivoDTO findLastByUserId(Long id);
 
-    public Objetivo save(ObjetivoDTO objetivoDto);
+    public ObjetivoDTO save(ObjetivoDTO objetivoDto);
 
-    public Objetivo findById(Long id);
+    public ObjetivoDTO findById(Long id);
 
-    public void delete(Objetivo objetivo);
+    public void delete(ObjetivoDTO objetivo);
 
     public boolean existsById(Long id);
 
-    public List<Objetivo> findListByUserId(Integer id);
+    public List<ObjetivoDTO> findListByUserId(Long id);
 }

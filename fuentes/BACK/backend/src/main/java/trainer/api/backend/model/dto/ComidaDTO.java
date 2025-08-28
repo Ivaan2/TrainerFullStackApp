@@ -1,33 +1,21 @@
 package trainer.api.backend.model.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import trainer.api.backend.model.entity.DietaDiaria;
+import lombok.Data;
 import trainer.api.backend.model.entity.enums.NombreComida;
 
 import java.time.LocalTime;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
 public class ComidaDTO {
-
     private Long id;
+    private Long dietaId;
 
-    private DietaDiaria dietaDiaria;
-
-    private NombreComida nombre;
-
+    private NombreComida tipoComida;
+    private String nombrePlato;
     private LocalTime hora;
 
     private Double aporteCalorico;
-
     private Double aporteProteico;
-
     private Double aporteGrasa;
-
     private Double aporteCarbohidratos;
 }

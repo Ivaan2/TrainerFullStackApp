@@ -11,6 +11,6 @@ public interface IComidaDao extends CrudRepository<Comida, Long> {
     /*
     Mostrar lista de comidas según idDieta
      */
-    @Query("SELECT c FROM Comida c WHERE c.dietaDiaria.id = :idDieta ORDER BY c.hora ASC")
+    @Query("SELECT c FROM Comida c WHERE c.dieta.id = :idDieta ORDER BY c.hora ASC")
     List<Comida> findByIdDieta(Long idDieta);
 }

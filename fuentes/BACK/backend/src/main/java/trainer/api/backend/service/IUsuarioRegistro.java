@@ -1,20 +1,21 @@
 package trainer.api.backend.service;
 
+import trainer.api.backend.model.dto.UsuarioRegistroDTO;
 import trainer.api.backend.model.entity.UsuarioRegistro;
 
 import java.util.List;
 
 public interface IUsuarioRegistro {
 
-    public UsuarioRegistro save(UsuarioRegistro usuarioRegistro);
+    UsuarioRegistroDTO save(UsuarioRegistroDTO usuarioRegistro);
 
     //Buscar un usuario por Id
-    public UsuarioRegistro findById(Integer id);
+    UsuarioRegistroDTO findById(Long id);
 
     //Eliminar el usuario
-    public void delete(UsuarioRegistro usuarioRegistro);
+    void delete(UsuarioRegistroDTO usuarioRegistro);
 
-    List<UsuarioRegistro> findAll();
+    List<UsuarioRegistroDTO> findAll();
 
-    UsuarioRegistro findByEmail(String email);
+    UsuarioRegistroDTO findByEmail(String email);
 }

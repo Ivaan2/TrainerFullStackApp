@@ -1,6 +1,5 @@
 package trainer.api.backend.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +8,8 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -34,6 +35,10 @@ public class Objetivo implements Serializable {
     @Column(name = "B_CUMPLIDO")
     private Boolean cumplido;
 
-    @Column(name = "FK_USUARIO", nullable = false)
-    private Long usuarioId;
+    @JoinColumn(name = "FK_USUARIO", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    private UsuarioRegistro usuario;
+
+    @OneToMany(mappedBy = "objetivo", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Informe> informe = new ArrayList<>();
 }

@@ -6,73 +6,80 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import trainer.api.backend.model.dto.InformeDTO;
-import trainer.api.backend.model.entity.Objetivo;
-import trainer.api.backend.model.entity.UsuarioRegistro;
+import trainer.api.backend.model.dto.ObjetivoDTO;
+import trainer.api.backend.model.dto.UsuarioRegistroDTO;
 import trainer.api.backend.model.entity.enums.Sexo;
 import trainer.api.backend.model.payload.MensajeResponse;
 import trainer.api.backend.service.IInforme;
 import trainer.api.backend.service.IObjetivo;
 import trainer.api.backend.service.IUsuarioRegistro;
 
-import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/informes")
 public class InformeController {
 
     private final IInforme informeService;
     private final IObjetivo objetivoService;
     private final IUsuarioRegistro usuarioRegistroService;
 
-    @PostMapping("informe")
-    public ResponseEntity<?> create(@RequestBody InformeDTO informeDto) {
-        if (ObjectUtils.isNotEmpty(informeDto)) {
-            // TODO: Fix this save method
-            Objetivo objetivo = objetivoService.findById(informeDto.getObjetivoId());
-            UsuarioRegistro usuario = usuarioRegistroService.findById(Math.toIntExact(objetivo.getUsuarioId()));
-            Date fechaNacimiento = usuario.getFechaNacimiento();
-
-            int edad = LocalDateTime.now().getYear() - fechaNacimiento.toLocalDate().getYear();
-            Sexo sexo = usuario.getSexo();
-
-            var informe = informeService.save(informeDto);
-            return new ResponseEntity<>(MensajeResponse.builder()
-                    .mensaje("Se ha creado el informe con éxito")
-                    .object(InformeDTO.builder()
-                            .id(informe.getId())
-                            .objetivoId(informe.getObjetivoId())
-                            .edad(edad)
-                            .sexo(sexo)
-                            .altura(informe.getAltura())
-                            .peso(informe.getPeso())
-                            .cadera(informe.getCadera())
-                            .gemelos(informe.getGemelos())
-                            .cuadriceps(informe.getCuadriceps())
-                            .abdomen(informe.getAbdomen())
-                            .pecho(informe.getPecho())
-                            .hombros(informe.getHombros())
-                            .antebrazo(informe.getAntebrazo())
-                            .biceps(informe.getBiceps())
-                            .gluteos(informe.getGluteos())
-                            .porcentajeGraso(informe.getPorcentajeGraso())
-                            .porcentajeMusculo(informe.getPorcentajeMusculo())
-                            .nivelActividad(informe.getNivelActividad())
-                            .imc(informe.getImc())
-                            .tmb(informe.getTmb())
-                            .fechaRegistro(TimestampToString(informe.getFechaRegistro())).build())
-                    .build(), HttpStatus.OK);
+    @PostMapping
+    public ResponseEntity<MensajeResponse> create(@RequestBody InformeDTO informeDto) {
+        if (ObjectUtils.isEmpty(informeDto)) {
+            return ResponseEntity.badRequest().body(
+                    MensajeResponse.builder()
+                            .mensaje("Formato inválido.")
+                            .object(null)
+                            .build()
+            );
         }
-        return new ResponseEntity<>(
+
+        // Recuperar Objetivo asociado
+        ObjetivoDTO objetivo = objetivoService.findById(informeDto.getObjetivoId());
+        if (objetivo == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    MensajeResponse.builder()
+                            .mensaje("El objetivo asociado no existe.")
+                            .object(null)
+                            .build()
+            );
+        }
+
+        // Recuperar Usuario asociado al objetivo
+        UsuarioRegistroDTO usuario = usuarioRegistroService.findById(objetivo.getUsuario().getIdUsuarioRegistro());
+        if (usuario == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    MensajeResponse.builder()
+                            .mensaje("El usuario asociado al objetivo no existe.")
+                            .object(null)
+                            .build()
+            );
+        }
+
+        // Calcular edad (puedes moverlo a un util si lo usarás en más sitios)
+        int edad = usuario.getFechaNacimiento().getYear() + 1900 >= LocalDate.now().getYear() ?
+                0 : LocalDate.now().getYear() - (usuario.getFechaNacimiento().getYear() + 1900);
+        Sexo sexo = usuario.getSexo();
+
+        // Guardar informe
+        InformeDTO savedInforme = informeService.save(informeDto);
+
+        // Enriquecer la respuesta si deseas incluir edad y sexo
+        savedInforme.setEdad(edad);
+        savedInforme.setSexo(sexo);
+
+        return ResponseEntity.ok(
                 MensajeResponse.builder()
-                        .mensaje("Formato inválido.")
-                        .object(null)
+                        .mensaje("Se ha creado el informe con éxito")
+                        .object(savedInforme)
                         .build()
-                , HttpStatus.BAD_REQUEST);
+        );
     }
 
     private String TimestampToString(Timestamp fechaRegistro) {
@@ -164,7 +171,7 @@ public class InformeController {
                     .object(null).build(),
                     HttpStatus.BAD_REQUEST);
         }
-        var ultimoObjetivo = objetivoService.findLastByUserId(Math.toIntExact(userId));
+        var ultimoObjetivo = objetivoService.findLastByUserId(userId);
         if (ObjectUtils.isEmpty(ultimoObjetivo)) {
             return new ResponseEntity<>(MensajeResponse.builder()
                     .mensaje("No se han encontrado objetivos para este usuario")
@@ -181,7 +188,7 @@ public class InformeController {
     @PostMapping("informe/lastObjetivo/{userId}")
     public ResponseEntity<?> createInformeLastObjetivoByUserId(@RequestBody InformeDTO informeDto, @PathVariable Long userId) {
         if (ObjectUtils.isNotEmpty(informeDto)) {
-            var ultimoObjetivo = objetivoService.findLastByUserId(Math.toIntExact(userId));
+            var ultimoObjetivo = objetivoService.findLastByUserId(userId);
             if (ObjectUtils.isEmpty(ultimoObjetivo)) {
                 return new ResponseEntity<>(MensajeResponse.builder()
                         .mensaje("No se han encontrado objetivos para este usuario")

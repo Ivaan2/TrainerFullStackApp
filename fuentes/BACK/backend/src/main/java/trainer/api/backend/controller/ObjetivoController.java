@@ -7,17 +7,16 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import trainer.api.backend.config.mapper.MapperFactory;
 import trainer.api.backend.model.dto.InformeDTO;
 import trainer.api.backend.model.dto.ObjetivoDTO;
 import trainer.api.backend.model.entity.Informe;
 import trainer.api.backend.model.entity.Objetivo;
-import trainer.api.backend.model.entity.UsuarioRegistro;
 import trainer.api.backend.model.payload.MensajeResponse;
 import trainer.api.backend.service.IInforme;
 import trainer.api.backend.service.IObjetivo;
 import trainer.api.backend.service.IUsuarioRegistro;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -26,232 +25,179 @@ import java.util.List;
 @Slf4j
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/objetivo")
 public class ObjetivoController {
 
     private final IObjetivo objetivoService;
     private final IUsuarioRegistro usuarioRegistroService;
     private final IInforme informeService;
+    private MapperFactory mapperFactory;
 
-    @PostMapping("objetivo")
-    public ResponseEntity<?> create(@RequestBody ObjetivoDTO objetivoDto) {
-        Objetivo clienteSave;
+    @PostMapping
+    public ResponseEntity<MensajeResponse> create(@RequestBody ObjetivoDTO objetivoDto) {
         try {
-            clienteSave = objetivoService.save(objetivoDto);
-            return new ResponseEntity<>(MensajeResponse.builder()
-                    .mensaje("Guardado correctamente")
-                    .object(ObjetivoDTO.builder()
-                            .cumplido(clienteSave.getCumplido())
-                            .descripcion(clienteSave.getDescripcion())
-                            .fechaFin(TimestampToString(clienteSave.getFechaFin()))
-                            .fechaRegistro(TimestampToString(clienteSave.getFechaRegistro()))
-                            .id(clienteSave.getId())
-                            .usuarioId(clienteSave.getUsuarioId())
-                            .build())
-                    .build()
-                    , HttpStatus.CREATED);
-        } catch (DataAccessException exDt) {
-            return new ResponseEntity<>(
-                    MensajeResponse.builder()
-                            .mensaje(exDt.getMessage())
+            ObjetivoDTO saved = objetivoService.save(objetivoDto);
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(MensajeResponse.builder()
+                            .mensaje("Guardado correctamente")
+                            .object(saved)
+                            .build());
+        } catch (DataAccessException ex) {
+            log.error("Error al guardar objetivo", ex);
+            return ResponseEntity
+                    .status(HttpStatus.METHOD_NOT_ALLOWED)
+                    .body(MensajeResponse.builder()
+                            .mensaje("Error al guardar objetivo: " + ex.getMessage())
                             .object(null)
-                            .build()
-                    , HttpStatus.METHOD_NOT_ALLOWED);
+                            .build());
         }
     }
 
-    @PutMapping("objetivo/{id}")
-    public ResponseEntity<?> update(@RequestBody ObjetivoDTO objetivoDto, @PathVariable Long id) {
-        Objetivo objetivoUpdate;
+    @PutMapping("/{id}")
+    public ResponseEntity<MensajeResponse> update(@RequestBody ObjetivoDTO objetivoDto, @PathVariable Long id) {
         try {
-            if (objetivoService.existsById(id)) {
-                objetivoDto.setId(id);
-                objetivoUpdate = objetivoService.save(objetivoDto);
-                return new ResponseEntity<>(MensajeResponse.builder()
-                        .mensaje("Guardado correctamente")
-                        .object(ObjetivoDTO.builder()
-                                .cumplido(objetivoUpdate.getCumplido())
-                                .descripcion(objetivoUpdate.getDescripcion())
-                                .fechaFin(TimestampToString(objetivoUpdate.getFechaFin()))
-                                .fechaRegistro(TimestampToString(objetivoUpdate.getFechaRegistro()))
-                                .id(objetivoUpdate.getId())
-                                .usuarioId(objetivoUpdate.getUsuarioId())
-                                .build())
-                        .build()
-                        , HttpStatus.OK);
+            if (!objetivoService.existsById(id)) {
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body(MensajeResponse.builder()
+                                .mensaje("El registro que intenta actualizar no existe")
+                                .object(null)
+                                .build());
             }
-            return new ResponseEntity<>(
-                    MensajeResponse.builder()
-                            .mensaje("El registro que intenta actualizar no se encuentra en la base de datos.")
+
+            objetivoDto.setId(id);
+            ObjetivoDTO updated = objetivoService.save(objetivoDto);
+
+            return ResponseEntity
+                    .ok(MensajeResponse.builder()
+                            .mensaje("Actualizado correctamente")
+                            .object(updated)
+                            .build());
+
+        } catch (DataAccessException ex) {
+            log.error("Error al actualizar objetivo con id {}", id, ex);
+            return ResponseEntity
+                    .status(HttpStatus.METHOD_NOT_ALLOWED)
+                    .body(MensajeResponse.builder()
+                            .mensaje("Error al actualizar objetivo: " + ex.getMessage())
                             .object(null)
-                            .build()
-                    , HttpStatus.NOT_FOUND);
-        } catch (DataAccessException exDt) {
-            return new ResponseEntity<>(
-                    MensajeResponse.builder()
-                            .mensaje(exDt.getMessage())
-                            .object(null)
-                            .build()
-                    , HttpStatus.METHOD_NOT_ALLOWED);
+                            .build());
         }
     }
 
-    @DeleteMapping("objetivo/{id}")
-    public ResponseEntity<?> deleteById(@PathVariable Long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<MensajeResponse> deleteById(@PathVariable Long id) {
         try {
-            Objetivo objetivoDelete = objetivoService.findById(id);
-            if (ObjectUtils.isNotEmpty(objetivoDelete)) {
-                objetivoService.delete(objetivoDelete);
-                return new ResponseEntity<>(MensajeResponse.builder()
-                        .mensaje("Registro eliminado correctamente")
-                        .object(objetivoDelete).build()
-                        , HttpStatus.OK);
+            ObjetivoDTO objetivo = objetivoService.findById(id);
+            if (objetivo == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(MensajeResponse.builder()
+                                .mensaje("No existe ese registro en la base de datos")
+                                .object(null)
+                                .build());
             }
-            return new ResponseEntity<>(MensajeResponse.builder()
-                    .mensaje("No existe ese registro en la base de datos")
-                    .object(null).build(), HttpStatus.NO_CONTENT);
-        } catch (DataAccessException exDt) {
-            return new ResponseEntity<>(
-                    MensajeResponse.builder()
-                            .mensaje(exDt.getMessage())
-                            .object(null)
-                            .build()
-                    , HttpStatus.CONFLICT);
-        }
-    }
-
-    @GetMapping("objetivo/{id}")
-    public ResponseEntity<?> showById(@PathVariable Long id) {
-        var objetivo = objetivoService.findById(id);
-
-        if (ObjectUtils.isNotEmpty(objetivo)) {
-            return new ResponseEntity<>(
-                    MensajeResponse.builder()
-                            .mensaje("Registro rescatado correctamente")
-                            .object(ObjetivoDTO.builder()
-                                    .cumplido(objetivo.getCumplido())
-                                    .descripcion(objetivo.getDescripcion())
-                                    .fechaFin(TimestampToString(objetivo.getFechaFin()))
-                                    .fechaRegistro(TimestampToString(objetivo.getFechaRegistro()))
-                                    .id(objetivo.getId())
-                                    .usuarioId(objetivo.getUsuarioId())
-                                    .build())
-                            .build()
-                    , HttpStatus.OK);
-        }
-        return new ResponseEntity<>(
+            objetivoService.delete(objetivo);
+            return ResponseEntity.ok(
                 MensajeResponse.builder()
-                        .mensaje("El registro que intenta buscar no existe")
-                        .object(null)
+                    .mensaje("Registro eliminado correctamente")
+                    .object(objetivo)
+                    .build()
+            );
+        } catch (DataAccessException exDt) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(MensajeResponse.builder()
+                            .mensaje(exDt.getMostSpecificCause().getMessage())
+                            .object(null)
+                            .build());
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<MensajeResponse> showById(@PathVariable Long id) {
+        ObjetivoDTO objetivo = objetivoService.findById(id);
+        if (objetivo == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(MensajeResponse.builder()
+                            .mensaje("El registro que intenta buscar no existe")
+                            .object(null)
+                            .build());
+        }
+
+        return ResponseEntity.ok(
+                MensajeResponse.builder()
+                        .mensaje("Registro rescatado correctamente")
+                        .object(objetivo)
                         .build()
-                , HttpStatus.NOT_FOUND);
+        );
     }
 
-    @GetMapping("objetivos/{id}")
-    public ResponseEntity<?> obtenerListaByIdUsuario(@PathVariable Integer id) {
-        log.info("*** Obteniendolista de objetivos para un usuario ***");
-        if (ObjectUtils.isEmpty(id) || id == 0) {
-            return new ResponseEntity<>(MensajeResponse.builder()
-                    .mensaje("El id de usuario no es correcto")
-                    .object(null).build(),
-                    HttpStatus.BAD_REQUEST);
-        }
-        var usuario = usuarioRegistroService.findById(id);
-        if (ObjectUtils.isEmpty(usuario)) {
-            return new ResponseEntity<>(MensajeResponse.builder()
-                    .mensaje("El id de usuario no se encuentra en el sistema")
-                    .object(null).build(),
-                    HttpStatus.NOT_FOUND);
-        }
-        List<Objetivo> listaObjetivos = objetivoService.findListByUserId(id);
-        List<ObjetivoDTO> listaObjetivosDTO = listaObjetivos.stream().map(objetivo -> ObjetivoDTO.builder()
-                .id(objetivo.getId())
-                .descripcion(objetivo.getDescripcion())
-                .fechaRegistro(TimestampToString(objetivo.getFechaRegistro()))
-                .fechaFin(TimestampToString(objetivo.getFechaFin()))
-                .cumplido(objetivo.getCumplido())
-                .usuarioId(objetivo.getUsuarioId())
-                .informes(listaInformesToDTO(objetivo.getId()))
-                .build()).toList();
+    @GetMapping("/{idUsuario}")
+    public ResponseEntity<MensajeResponse> obtenerListaByIdUsuario(@PathVariable Long idUsuario) {
+        log.info("*** Obteniendo lista de objetivos para un usuario ***");
 
-        return new ResponseEntity<>(MensajeResponse.builder()
-                .mensaje("Se devuelve la lista de objetivos relacionados al usuario")
-                .object(listaObjetivosDTO).build(),
-                HttpStatus.OK);
-    }
-
-    @GetMapping("objetivo/user/{idUsuario}")
-    public ResponseEntity<?> obtenerUltimoObjetivo(@PathVariable Integer idUsuario) {
-        log.info("*** Obteniendo el último objetivo del usuario ***");
-        if (ObjectUtils.isEmpty(idUsuario) || idUsuario == 0) {
-            return new ResponseEntity<>(MensajeResponse.builder()
-                    .mensaje("El id de usuario no es correcto")
-                    .object(null).build(),
-                    HttpStatus.BAD_REQUEST);
+        if (idUsuario == null || idUsuario <= 0) {
+            return ResponseEntity.badRequest()
+                    .body(MensajeResponse.builder()
+                            .mensaje("El id de usuario no es correcto")
+                            .object(null)
+                            .build());
         }
+
         var usuario = usuarioRegistroService.findById(idUsuario);
-        if (ObjectUtils.isEmpty(usuario)) {
-            return new ResponseEntity<>(MensajeResponse.builder()
-                    .mensaje("El id de usuario no se encuentra en el sistema")
-                    .object(null).build(),
-                    HttpStatus.NOT_FOUND);
-        }
-        Objetivo ultimoObjetivo = objetivoService.findLastByUserId(idUsuario);
-        if(ObjectUtils.isEmpty(ultimoObjetivo)) {
-            return new ResponseEntity<>(MensajeResponse.builder()
-                    .mensaje("No se encontraron objetivos relacionados al usuario")
-                    .object(null).build(),
-                    HttpStatus.NO_CONTENT);
+        if (usuario == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(MensajeResponse.builder()
+                            .mensaje("El id de usuario no se encuentra en el sistema")
+                            .object(null)
+                            .build());
         }
 
-        List<InformeDTO> informesDto = listaInformesToDTO(ultimoObjetivo.getId());
-        return new ResponseEntity<>(MensajeResponse.builder()
-                .mensaje("Se devuelve el último objetivo relacionado al usuario")
-                .object(ObjetivoDTO.builder()
-                        .cumplido(ultimoObjetivo.getCumplido())
-                        .descripcion(ultimoObjetivo.getDescripcion())
-                        .fechaFin(TimestampToString(ultimoObjetivo.getFechaFin()))
-                        .fechaRegistro(TimestampToString(ultimoObjetivo.getFechaRegistro()))
-                        .id(ultimoObjetivo.getId())
-                        .usuarioId(ultimoObjetivo.getUsuarioId())
-                        .informes(informesDto)
-                        .build()).build(),
-                HttpStatus.OK);
+        List<ObjetivoDTO> listaObjetivosDTO = objetivoService.findListByUserId(idUsuario);
+
+        return ResponseEntity.ok(
+                MensajeResponse.builder()
+                        .mensaje("Se devuelve la lista de objetivos relacionados al usuario")
+                        .object(listaObjetivosDTO)
+                        .build()
+        );
     }
 
-    private List<InformeDTO> listaInformesToDTO(Long objetivoId) {
-        List<Informe> listaInformes = informeService.findListByIdObjetivo(objetivoId);
+    @GetMapping("/user/{idUsuario}")
+    public ResponseEntity<MensajeResponse> obtenerUltimoObjetivo(@PathVariable Long idUsuario) {
+        log.info("*** Obteniendo el último objetivo del usuario ***");
 
-        return listaInformes.stream().map(informe -> InformeDTO.builder()
-                .id(informe.getId())
-                .objetivoId(objetivoId)
-                .altura(informe.getAltura())
-                .peso(informe.getPeso())
-                .cadera(informe.getCadera())
-                .gemelos(informe.getGemelos())
-                .cuadriceps(informe.getCuadriceps())
-                .abdomen(informe.getAbdomen())
-                .pecho(informe.getPecho())
-                .hombros(informe.getHombros())
-                .antebrazo(informe.getAntebrazo())
-                .biceps(informe.getBiceps())
-                .gluteos(informe.getGluteos())
-                .porcentajeGraso(informe.getPorcentajeGraso())
-                .porcentajeMusculo(informe.getPorcentajeMusculo())
-                .nivelActividad(informe.getNivelActividad())
-                .diasEntreno(informe.getDiasEntreno())
-                .seguimientoDieta(informe.getSeguimientoDieta())
-                .imc(informe.getImc())
-                .tmb(informe.getTmb())
-                .fechaRegistro(TimestampToString(informe.getFechaRegistro()))
-                .build()).toList();
-    }
+        if (idUsuario == null || idUsuario <= 0) {
+            return ResponseEntity.badRequest()
+                    .body(MensajeResponse.builder()
+                            .mensaje("El id de usuario no es correcto")
+                            .object(null)
+                            .build());
+        }
 
-    private String TimestampToString(Timestamp fechaRegistro) {
-        LocalDateTime localDateTime = fechaRegistro.toLocalDateTime();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        var usuario = usuarioRegistroService.findById(idUsuario);
+        if (usuario == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(MensajeResponse.builder()
+                            .mensaje("El id de usuario no se encuentra en el sistema")
+                            .object(null)
+                            .build());
+        }
 
-        // Formatear el LocalDateTime a String
-        return localDateTime.format(formatter);
+        ObjetivoDTO ultimoObjetivoDto = objetivoService.findLastByUserId(idUsuario);
+        if (ultimoObjetivoDto == null) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                    .body(MensajeResponse.builder()
+                            .mensaje("No se encontraron objetivos relacionados al usuario")
+                            .object(null)
+                            .build());
+        }
+
+        return ResponseEntity.ok(
+                MensajeResponse.builder()
+                        .mensaje("Se devuelve el último objetivo relacionado al usuario")
+                        .object(ultimoObjetivoDto)
+                        .build()
+        );
     }
 }

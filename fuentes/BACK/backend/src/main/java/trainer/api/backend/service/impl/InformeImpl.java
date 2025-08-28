@@ -2,6 +2,7 @@ package trainer.api.backend.service.impl;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import trainer.api.backend.config.mapper.MapperFactory;
 import trainer.api.backend.model.dao.IInformeDao;
 import trainer.api.backend.model.dao.IObjetivoDao;
 import trainer.api.backend.model.dao.IUsuarioRegistroDao;
@@ -9,7 +10,6 @@ import trainer.api.backend.model.dto.InformeDTO;
 import trainer.api.backend.model.entity.Informe;
 import trainer.api.backend.model.entity.Objetivo;
 import trainer.api.backend.model.entity.UsuarioRegistro;
-import trainer.api.backend.model.entity.enums.NivelActividad;
 import trainer.api.backend.model.entity.enums.Sexo;
 import trainer.api.backend.service.IInforme;
 
@@ -25,46 +25,50 @@ import java.util.Optional;
 @AllArgsConstructor
 public class InformeImpl implements IInforme {
 
-    public IInformeDao informeDao;
-    private IObjetivoDao objetivoDaoService;
-    private IUsuarioRegistroDao usuarioRegistroDaoService;
+    private final IInformeDao informeDaoService;
+    private final IObjetivoDao objetivoDaoService;
+    private final IUsuarioRegistroDao usuarioRegistroDaoService;
+    private final MapperFactory mapperFactory;
 
     @Override
-    public Informe save(InformeDTO informeDto) {
-        Optional<Objetivo> objetivo = objetivoDaoService.findById(informeDto.getObjetivoId());
-        var objetivoObj = objetivo.orElse(null);
-        UsuarioRegistro usuario = usuarioRegistroDaoService.findById(Math.toIntExact(objetivoObj.getUsuarioId())).get();
+    public InformeDTO save(InformeDTO informeDto) {
+        Objetivo objetivo = objetivoDaoService.findById(informeDto.getObjetivoId())
+                .orElseThrow(() -> new IllegalArgumentException("Objetivo no encontrado"));
 
-        Date fechaNacimiento = usuario.getFechaNacimiento();
-        int edad = LocalDateTime.now().getYear() - fechaNacimiento.toLocalDate().getYear();
+        UsuarioRegistro usuario = usuarioRegistroDaoService.findById(objetivo.getUsuario().getIdUsuarioRegistro())
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        int edad = calcularEdad(usuario.getFechaNacimiento());
         Sexo sexo = usuario.getSexo();
         Double peso = informeDto.getPeso();
         int altura = informeDto.getAltura();
-        Informe informe = Informe.builder()
-                .altura(altura)
-                .abdomen(informeDto.getAbdomen())
-                .imc(calculateIMC(peso, altura))
-                .cadera(informeDto.getCadera())
-                .biceps(informeDto.getBiceps())
-                .cuadriceps(informeDto.getCuadriceps())
-                .gemelos(informeDto.getGemelos())
-                .sexo(sexo)
-                .edad(edad)
-                .fechaRegistro(dateToTimestamp(informeDto.getFechaRegistro()))
-                .pecho(informeDto.getPecho())
-                .peso(peso)
-                .gluteos(informeDto.getGluteos())
-                .hombros(informeDto.getHombros())
-                .antebrazo(informeDto.getAntebrazo())
-                .diasEntreno(informeDto.getDiasEntreno())
-                .seguimientoDieta(informeDto.getSeguimientoDieta())
-                .id(informeDto.getId())
-                .tmb(calculateTMB(peso, altura, edad, sexo.toString(), informeDto.getDiasEntreno()))
-                .nivelActividad(informeDto.getNivelActividad())
-                .objetivoId(informeDto.getObjetivoId())
-                .porcentajeGraso(informeDto.getPorcentajeGraso())
-                .porcentajeMusculo(informeDto.getPorcentajeMusculo()).build();
-        return informeDao.save(informe);
+
+        // Convertir el DTO en entidad
+        Informe informe = mapperFactory.getInformeMapper().toEntity(informeDto);
+
+        // Sobrescribir los cálculos que no deben venir del cliente
+        informe.setEdad(edad);
+        informe.setSexo(sexo);
+        informe.setImc(calculateIMC(peso, altura));
+        informe.setTmb(calculateTMB(peso, altura, edad, sexo.name(), informeDto.getDiasEntreno()));
+        informe.setFechaRegistro(dateToTimestamp(informeDto.getFechaRegistro().toString()));
+
+        // Guardar
+        Informe saved = informeDaoService.save(informe);
+
+        // Devolver DTO
+        return mapperFactory.getInformeMapper().toDTO(saved);
+    }
+
+    private int calcularEdad(Date fechaNacimiento) {
+        // Calcula la edad en años teniendo en cuenta si ya ha cumplido años este año
+        LocalDate fechaNac = fechaNacimiento.toLocalDate();
+        LocalDate hoy = LocalDate.now();
+        int edad = hoy.getYear() - fechaNac.getYear();
+        if (hoy.getDayOfYear() < fechaNac.getDayOfYear()){
+            edad = -1;
+        }
+        return edad;
     }
 
     private static Timestamp dateToTimestamp(String fecha) {
@@ -76,25 +80,16 @@ public class InformeImpl implements IInforme {
         return Timestamp.valueOf(localDateTime);
     }
 
-    // Tasa Metabolica Basal
     private static Double calculateTMB(Double peso, int altura, int edad, String sexo, int diasEntreno) {
         double tmbAprox = (10 * peso) + (6.25 * altura) - (5 * edad) + (sexo.equals("MASCULINO") ? 5 : -161);
+
         double nivelActividad;
-        if (diasEntreno == 0) {
-            nivelActividad = 1.2;
+        if (diasEntreno == 0) nivelActividad = 1.2;
+        else if (diasEntreno < 4) nivelActividad = 1.375;
+        else if (diasEntreno < 6) nivelActividad = 1.55;
+        else if (diasEntreno < 8) nivelActividad = 1.725;
+        else nivelActividad = 1.9;
 
-        } else if (diasEntreno < 4) {
-            nivelActividad = 1.375;
-
-        } else if (diasEntreno < 6) {
-            nivelActividad = 1.55;
-
-        } else if (diasEntreno < 8) {
-            nivelActividad = 1.725;
-
-        } else {
-            nivelActividad = 1.9;
-        }
         return tmbAprox * nivelActividad;
     }
 
@@ -103,17 +98,22 @@ public class InformeImpl implements IInforme {
     }
 
     @Override
-    public Informe findById(Long id) {
-        return informeDao.findById(id).orElse(null);
+    public InformeDTO findById(Long id) {
+        return informeDaoService.findById(id)
+                .map(mapperFactory.getInformeMapper()::toDTO)
+                .orElse(null);
     }
 
     @Override
-    public void delete(Informe informe) {
-        informeDao.delete(informe);
+    public void delete(InformeDTO informeDto) {
+        Informe informe = mapperFactory.getInformeMapper().toEntity(informeDto);
+        informeDaoService.delete(informe);
     }
 
     @Override
-    public List<Informe> findListByIdObjetivo(Long id) {
-        return informeDao.findListByObjetivoId(id);
+    public List<InformeDTO> findListByIdObjetivo(Long id) {
+        return informeDaoService.findListByObjetivoId(id).stream()
+                .map(mapperFactory.getInformeMapper()::toDTO)
+                .toList();
     }
 }

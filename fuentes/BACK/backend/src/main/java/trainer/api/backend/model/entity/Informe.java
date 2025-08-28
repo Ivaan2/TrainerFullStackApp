@@ -10,6 +10,8 @@ import trainer.api.backend.model.entity.enums.SeguimientoDieta;
 import trainer.api.backend.model.entity.enums.Sexo;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -18,13 +20,11 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @Table(name = "T_INFORME")
 public class Informe {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_INFORME")
     private Long id;
-
-    @Column(name = "FK_OBJETIVO", nullable = false)
-    private Long objetivoId;
 
     @Column(name = "N_EDAD", nullable = false)
     private Integer edad;
@@ -92,4 +92,10 @@ public class Informe {
     @Column(name = "F_FECHA_REGISTRO", nullable = false)
     private Timestamp fechaRegistro;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FK_OBJETIVO", nullable = false)
+    private Objetivo objetivo;
+
+    @OneToMany(mappedBy = "informe", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<DietaDiaria> dietaDiaria = new ArrayList<>();
 }

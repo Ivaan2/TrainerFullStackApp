@@ -10,9 +10,27 @@ services:
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://database:3306/trainer-db
       - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_DATASOURCE_PASSWORD=
     depends_on:
       - database
+    networks:
+      - app-network
+    restart: always
+
+  database:
+    image: mysql:8.0
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_DATABASE: "trainer-db"
+    volumes:
+      - ./db-data:/var/lib/mysql
+      - ./db/db-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
+    restart: always
 
   frontend:
     build:
@@ -20,11 +38,12 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+    restart: always
 
-  database:
-    image: mysql:8.0
-    ports:
-      - "3306:3306"
-    environment:
-      - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_DATABASE=trainer-db
+networks:
+  app-network:
+    driver: bridge

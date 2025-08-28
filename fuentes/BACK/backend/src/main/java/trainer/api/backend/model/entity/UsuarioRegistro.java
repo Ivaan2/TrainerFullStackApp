@@ -7,6 +7,8 @@ import trainer.api.backend.model.entity.enums.Sexo;
 import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -19,7 +21,7 @@ public class UsuarioRegistro implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_USUARIO_REGISTRO")
-    private Integer idUsuarioRegistro;
+    private Long idUsuarioRegistro;
 
     @Column(name = "D_NOMBRE_USUARIO", nullable = false, length = 100)
     private String nombreUsuario;
@@ -59,4 +61,7 @@ public class UsuarioRegistro implements Serializable {
 
     @Column(name = "F_FECHA_BAJA")
     private Date fechaBaja;
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Objetivo> objetivos = new ArrayList<>();
 }

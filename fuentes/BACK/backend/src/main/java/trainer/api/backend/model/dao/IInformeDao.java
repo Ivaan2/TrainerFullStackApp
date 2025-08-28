@@ -8,6 +8,6 @@ import trainer.api.backend.model.entity.Informe;
 import java.util.List;
 
 public interface IInformeDao extends CrudRepository<Informe, Long> {
-    @Query("FROM Informe i WHERE i.objetivoId=:id")
+    @Query("FROM Informe i WHERE i.objetivo.id=:id")
     List<Informe> findListByObjetivoId(@Param("id") Long id);
 }

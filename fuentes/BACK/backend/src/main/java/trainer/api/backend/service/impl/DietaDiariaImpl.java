@@ -2,6 +2,7 @@ package trainer.api.backend.service.impl;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import trainer.api.backend.config.mapper.MapperFactory;
 import trainer.api.backend.model.dao.IDietaDiariaDao;
 import trainer.api.backend.model.dto.DietaDiariaDTO;
 import trainer.api.backend.model.entity.DietaDiaria;
@@ -12,28 +13,28 @@ import trainer.api.backend.service.IDietaDiaria;
 public class DietaDiariaImpl implements IDietaDiaria {
 
     public IDietaDiariaDao dietaDiariaDao;
+    private final MapperFactory mapperFactory;
 
     @Override
-    public DietaDiaria save(DietaDiariaDTO dietaDto) {
-        var dietaObj = DietaDiaria.builder()
-            .dia(dietaDto.getDia())
-            .comidasDiarias(dietaDto.getComidasDiarias())
-            .caloriasTotales(dietaDto.getCaloriasTotales())
-            .informeId(dietaDto.getInformeId())
-            .requerimientoAgua(dietaDto.getRequerimientoAgua())
-            .requerimientoCarbohidratos(dietaDto.getRequerimientoCarbohidratos())
-            .requerimientoGrasa(dietaDto.getRequerimientoGrasa())
-            .requerimientoProteico(dietaDto.getRequerimientoProteico()).build();
-        return dietaDiariaDao.save(dietaObj);
+    public DietaDiariaDTO save(DietaDiariaDTO dietaDto) {
+        // Convertir DTO a entidad usando el mapper
+        DietaDiaria dieta = mapperFactory.getDietaDiariaMapper().toEntity(dietaDto);
+        DietaDiaria saved = dietaDiariaDao.save(dieta);
+        // Convertir de vuelta a DTO antes de retornar
+        return mapperFactory.getDietaDiariaMapper().toDTO(saved);
     }
 
     @Override
-    public DietaDiaria findById(Long id) {
-        return dietaDiariaDao.findById(id).orElse(null);
+    public DietaDiariaDTO findById(Long id) {
+        return dietaDiariaDao.findById(id)
+                .map(mapperFactory.getDietaDiariaMapper()::toDTO)
+                .orElse(null);
     }
 
     @Override
-    public void delete(DietaDiaria dieta) {
+    public void delete(DietaDiariaDTO dietaDto) {
+        // Convertimos el DTO a entidad para poder eliminarlo
+        DietaDiaria dieta = mapperFactory.getDietaDiariaMapper().toEntity(dietaDto);
         dietaDiariaDao.delete(dieta);
     }
 }

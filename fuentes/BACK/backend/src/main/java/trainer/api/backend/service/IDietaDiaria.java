@@ -5,9 +5,9 @@ import trainer.api.backend.model.entity.DietaDiaria;
 
 public interface IDietaDiaria {
 
-    public DietaDiaria save(DietaDiariaDTO dieta);
+    DietaDiariaDTO save(DietaDiariaDTO dieta);
 
-    public DietaDiaria findById(Long id);
+    DietaDiariaDTO findById(Long id);
 
-    public void delete(DietaDiaria dieta);
+    void delete(DietaDiariaDTO dieta);
 }

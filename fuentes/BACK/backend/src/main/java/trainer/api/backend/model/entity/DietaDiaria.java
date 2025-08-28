@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import trainer.api.backend.model.entity.enums.DiaSemana;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -17,9 +20,6 @@ public class DietaDiaria {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_DIETA")
     private Long id;
-
-    @Column(name = "FK_INFORME", nullable = false)
-    private Long informeId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "D_DIA", nullable = false)
@@ -43,6 +43,10 @@ public class DietaDiaria {
     @Column(name = "N_REQ_AGUA", nullable = false)
     private Double requerimientoAgua;
 
-    /*@OneToMany(mappedBy = "dietaDiaria")
-    private List<Comida> comidas;*/
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FK_INFORME", nullable = false)
+    private Informe informe;
+
+    @OneToMany(mappedBy = "dieta", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Comida> comidas = new ArrayList<>();
 }

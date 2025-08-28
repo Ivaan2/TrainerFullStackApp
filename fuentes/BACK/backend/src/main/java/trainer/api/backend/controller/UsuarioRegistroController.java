@@ -3,12 +3,12 @@ package trainer.api.backend.controller;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.springframework.web.bind.annotation.*;
 import trainer.api.backend.model.dto.LoginRequestDto;
 import trainer.api.backend.model.dto.UpdatePasswordDto;
@@ -17,13 +17,8 @@ import trainer.api.backend.model.entity.UsuarioRegistro;
 import trainer.api.backend.model.payload.MensajeResponse;
 import trainer.api.backend.service.IUsuarioRegistro;
 
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-
-import static org.apache.logging.log4j.message.MapMessage.MapFormat.JSON;
 
 @Slf4j
 @RestController
@@ -38,34 +33,34 @@ public class UsuarioRegistroController {
     @PostMapping("/usuarioRegistro")
     public ResponseEntity<?> create(@RequestBody UsuarioRegistroDTO usuarioRegistroDto){
         log.info("** Lanzando POST Method **");
+
         if(ObjectUtils.isNotEmpty(usuarioRegistroDto)){
-            var nuevo_usuario = new UsuarioRegistro();
-            usuarioDTOToEntity(usuarioRegistroDto, nuevo_usuario);
-            usuarioRegistroService.save(nuevo_usuario);
+            UsuarioRegistroDTO usuarioRegistroDTO = usuarioRegistroService.save(usuarioRegistroDto);
+
             log.info("Entidad guardada en base de datos");
+
             return new ResponseEntity<>(MensajeResponse.builder()
                     .mensaje("Guardado correctamente")
-                    .object(nuevo_usuario)
+                    .object(usuarioRegistroDTO)
                     .build()
                     , HttpStatus.CREATED);
         }
+
         return new ResponseEntity<>(MensajeResponse.builder().mensaje("Se ha producido un error al guardar el usuario")
                 .object(null).build(), HttpStatus.BAD_REQUEST);
     }
 
     @PutMapping("/usuarioRegistro/{id}")
-    public ResponseEntity<?> update(@RequestBody UsuarioRegistroDTO usuarioRegistroDto, @PathVariable Integer id) {
-        UsuarioRegistro usuarioExistente = usuarioRegistroService.findById(id);
+    public ResponseEntity<?> update(@RequestBody UsuarioRegistroDTO usuarioRegistroDto, @PathVariable Long id) {
+        UsuarioRegistroDTO usuarioExistenteDto = usuarioRegistroService.findById(id);
 
-        if (usuarioExistente != null) {
-            // Actualizar los campos del usuario existente con los valores del DTO
-            usuarioDTOToEntity(usuarioRegistroDto, usuarioExistente);
+        if (usuarioExistenteDto != null) {
 
             // Guardar el usuario actualizado en la base de datos
-            UsuarioRegistro usuarioActualizado = usuarioRegistroService.save(usuarioExistente);
+            UsuarioRegistroDTO usuarioActualizadoDto = usuarioRegistroService.save(usuarioRegistroDto);
             return new ResponseEntity<>(MensajeResponse.builder()
                     .mensaje("Guardado correctamente")
-                    .object(usuarioActualizado)
+                    .object(usuarioActualizadoDto)
                     .build(), HttpStatus.OK);
         }
         return new ResponseEntity<>(MensajeResponse.builder()
@@ -74,74 +69,24 @@ public class UsuarioRegistroController {
                 .build(), HttpStatus.NOT_FOUND);
     }
 
-    private static void usuarioDTOToEntity(UsuarioRegistroDTO usuarioRegistroDto, UsuarioRegistro usuarioExistente) {
-        log.info("Parseando DTO a Entidad");
-        if (usuarioRegistroDto.getNombre() != null) {
-            usuarioExistente.setNombre(usuarioRegistroDto.getNombre());
-        }
-
-        if (usuarioRegistroDto.getApellido1() != null) {
-            usuarioExistente.setApellido1(usuarioRegistroDto.getApellido1());
-        }
-
-        if (usuarioRegistroDto.getApellido2() != null) {
-            usuarioExistente.setApellido2(usuarioRegistroDto.getApellido2());
-        }
-
-        if (usuarioRegistroDto.getEmail() != null) {
-            usuarioExistente.setEmail(usuarioRegistroDto.getEmail());
-        }
-
-        if (usuarioRegistroDto.getNombreUsuario() != null) {
-            usuarioExistente.setNombreUsuario(usuarioRegistroDto.getNombreUsuario());
-        }
-
-        if (usuarioRegistroDto.getPais() != null) {
-            usuarioExistente.setPais(usuarioRegistroDto.getPais());
-        }
-
-        if (usuarioRegistroDto.getSexo() != null) {
-            usuarioExistente.setSexo(usuarioRegistroDto.getSexo());
-        }
-
-        if (usuarioRegistroDto.getRutaAvatar() != null) {
-            usuarioExistente.setRutaAvatar(usuarioRegistroDto.getRutaAvatar());
-        }
-
-// Fecha de actualización siempre se debe setear a la fecha actual
-        usuarioExistente.setFechaActualizacion(new Timestamp(new Date().getTime()));
-
-// Codificar y setear la contraseña solo si no es nula
-        if (usuarioRegistroDto.getPassword() != null) {
-            usuarioExistente.setPassword(passwordEncoder.encode(usuarioRegistroDto.getPassword()));
-        }
-
-        if (!Objects.isNull(usuarioRegistroDto.getFechaNacimiento())) {
-            usuarioExistente.setFechaNacimiento(usuarioRegistroDto.getFechaNacimiento());
-        }
-
-// Solo establecer las fechas si realmente son necesarias
-        usuarioExistente.setFechaRegistro(new Timestamp(new Date().getTime()));
-        usuarioExistente.setFechaActualizacion(null); // Si tienes lógica para esto
-        usuarioExistente.setFechaBaja(null); // Si tienes lógica para esto también
-
-    }
-
-
     @DeleteMapping("/usuarioRegistro/{id}")
-    public ResponseEntity<?> deleteById(@PathVariable Integer id){
-        var usuarioRegistro = new UsuarioRegistro();
+    public ResponseEntity<?> deleteById(@PathVariable Long id){
+        UsuarioRegistroDTO usuarioRegistroDTO = UsuarioRegistroDTO.builder().build();
         try{
-            usuarioRegistro = usuarioRegistroService.findById(id);
-            usuarioRegistroService.delete(usuarioRegistro);
+            usuarioRegistroDTO = usuarioRegistroService.findById(id);
+            usuarioRegistroService.delete(usuarioRegistroDTO);
         }catch(DataAccessException e){
             log.info("No se ha podido encontrar el usuario con id: "+ id);
+            return new ResponseEntity<>(usuarioRegistroDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(usuarioRegistro, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(MensajeResponse.builder()
+                .mensaje("Se ha eliminado el usuario con éxito")
+                .object(usuarioRegistroDTO).build(),
+            HttpStatus.OK);
     }
 
     @GetMapping("/usuarioRegistro/{id}")
-    public ResponseEntity<?> showById(@PathVariable Integer id){
+    public ResponseEntity<?> showById(@PathVariable Long id){
         log.info("** Lanzando GET Method **");
         var usuarioRegistro = usuarioRegistroService.findById(id);
         if (ObjectUtils.isEmpty(usuarioRegistro)) return ResponseEntity.badRequest().build();
@@ -152,7 +97,7 @@ public class UsuarioRegistroController {
     }
 
     @PatchMapping("/usuarioRegistro/{id}")
-    public ResponseEntity<?> updatePassword(@PathVariable Integer id, @RequestBody UpdatePasswordDto updatePasswordDto) {
+    public ResponseEntity<?> updatePassword(@PathVariable Long id, @RequestBody UpdatePasswordDto updatePasswordDto) {
         String newPassword = updatePasswordDto.getNewPassword();
         String oldPassword = updatePasswordDto.getOldPassword();
 
@@ -199,7 +144,7 @@ public class UsuarioRegistroController {
 
 
     @GetMapping("usuarioRegistro/password/{id}")
-    public ResponseEntity<?> getPasswordCodificada(@PathVariable Integer id){
+    public ResponseEntity<?> getPasswordCodificada(@PathVariable Long id){
         if (ObjectUtils.isEmpty(id) || id==0){
             return new ResponseEntity<>(MensajeResponse.builder()
                     .mensaje("El id proporcionado es incorrecto")
@@ -221,7 +166,7 @@ public class UsuarioRegistroController {
 
     @GetMapping("usuarioRegistro/getAll")
     public ResponseEntity<?> getAll(){
-        List<UsuarioRegistro> listaUsuarios = usuarioRegistroService.findAll();
+        List<UsuarioRegistroDTO> listaUsuarios = usuarioRegistroService.findAll();
         if (ObjectUtils.isEmpty(listaUsuarios)){
             return new ResponseEntity<>(MensajeResponse.builder()
                     .mensaje("No se han encontrado usuarios")
@@ -256,7 +201,7 @@ public class UsuarioRegistroController {
     }
 
     @PatchMapping("usuarioRegistro/cambiarAvatar/{id}")
-    public ResponseEntity<?> cambiarAvatar(@PathVariable Integer id, @RequestBody Map<String, String> payload) {
+    public ResponseEntity<?> cambiarAvatar(@PathVariable Long id, @RequestBody Map<String, String> payload) {
         var usuario = usuarioRegistroService.findById(id);
 
         if (ObjectUtils.isEmpty(usuario)) {
@@ -281,7 +226,7 @@ public class UsuarioRegistroController {
     }
 
     @PatchMapping("usuarioRegistro/cambiarEmail/{id}")
-    public ResponseEntity<?> cambiarEmail(@PathVariable Integer id, @RequestBody Map<String, String> payload) {
+    public ResponseEntity<?> cambiarEmail(@PathVariable Long id, @RequestBody Map<String, String> payload) {
         var usuario = usuarioRegistroService.findById(id);
 
         if (ObjectUtils.isEmpty(usuario)) {

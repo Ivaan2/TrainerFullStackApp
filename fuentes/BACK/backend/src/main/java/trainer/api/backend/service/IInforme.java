@@ -7,11 +7,11 @@ import java.util.List;
 
 public interface IInforme {
 
-    public Informe save(InformeDTO informeDto);
+    InformeDTO save(InformeDTO informeDto);
 
-    public Informe findById(Long id);
+    InformeDTO findById(Long id);
 
-    public void delete(Informe informe);
+    void delete(InformeDTO informe);
 
-    public List<Informe> findListByIdObjetivo(Long id);
+    List<InformeDTO> findListByIdObjetivo(Long id);
 }
