@@ -1,7 +1,6 @@
 package trainer.api.backend.service;
 
 import trainer.api.backend.model.dto.UsuarioRegistroDTO;
-import trainer.api.backend.model.entity.UsuarioRegistro;
 
 import java.util.List;
 
@@ -18,4 +17,7 @@ public interface IUsuarioRegistro {
     List<UsuarioRegistroDTO> findAll();
 
     UsuarioRegistroDTO findByEmail(String email);
+
+    // Login/registro usando idToken de Google
+    UsuarioRegistroDTO googleLogin(String idToken);
 }

@@ -14,15 +14,12 @@ import trainer.api.backend.service.IInforme;
 import trainer.api.backend.service.IObjetivo;
 import trainer.api.backend.service.IUsuarioRegistro;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/v1/informes")
+@RequestMapping("/api/v1/informe")
 public class InformeController {
 
     private final IInforme informeService;
@@ -80,14 +77,6 @@ public class InformeController {
                         .object(savedInforme)
                         .build()
         );
-    }
-
-    private String TimestampToString(Timestamp fechaRegistro) {
-        LocalDateTime localDateTime = fechaRegistro.toLocalDateTime();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-        // Formatear el LocalDateTime a String
-        return localDateTime.format(formatter);
     }
 
     @PutMapping("informe/{id}")
@@ -185,10 +174,10 @@ public class InformeController {
                 HttpStatus.OK);
     }
 
-    @PostMapping("informe/lastObjetivo/{userId}")
+    @PostMapping("/lastObjetivo/{userId}")
     public ResponseEntity<?> createInformeLastObjetivoByUserId(@RequestBody InformeDTO informeDto, @PathVariable Long userId) {
         if (ObjectUtils.isNotEmpty(informeDto)) {
-            var ultimoObjetivo = objetivoService.findLastByUserId(userId);
+            var ultimoObjetivo = usuarioRegistroService.findById(userId).getLastObjetivo();
             if (ObjectUtils.isEmpty(ultimoObjetivo)) {
                 return new ResponseEntity<>(MensajeResponse.builder()
                         .mensaje("No se han encontrado objetivos para este usuario")

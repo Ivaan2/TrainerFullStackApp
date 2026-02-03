@@ -184,7 +184,7 @@ public class ObjetivoController {
                             .build());
         }
 
-        ObjetivoDTO ultimoObjetivoDto = objetivoService.findLastByUserId(idUsuario);
+        ObjetivoDTO ultimoObjetivoDto = usuario.getObjetivos().get(usuario.getObjetivos().size() - 1);
         if (ultimoObjetivoDto == null) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT)
                     .body(MensajeResponse.builder()

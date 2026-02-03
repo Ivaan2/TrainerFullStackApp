@@ -5,7 +5,6 @@ import trainer.api.backend.model.entity.enums.NivelActividad;
 import trainer.api.backend.model.entity.enums.SeguimientoDieta;
 import trainer.api.backend.model.entity.enums.Sexo;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 @Data
@@ -38,8 +37,8 @@ public class InformeDTO {
     private Double imc;
     private Double tmb;
 
-    private Timestamp fechaRegistro;
+    // Fecha en formato yyyy-MM-dd (serializable hacia el cliente)
+    private String fechaRegistro;
 
     private List<DietaDiariaDTO> dietaDiaria; // se expone como lista de DTOs
 }
-

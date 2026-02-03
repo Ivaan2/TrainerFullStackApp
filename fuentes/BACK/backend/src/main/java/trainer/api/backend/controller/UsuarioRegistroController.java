@@ -1,6 +1,6 @@
 package trainer.api.backend.controller;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.dao.DataAccessException;
@@ -8,21 +8,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import org.springframework.web.bind.annotation.*;
 import trainer.api.backend.model.dto.LoginRequestDto;
 import trainer.api.backend.model.dto.UpdatePasswordDto;
 import trainer.api.backend.model.dto.UsuarioRegistroDTO;
-import trainer.api.backend.model.entity.UsuarioRegistro;
 import trainer.api.backend.model.payload.MensajeResponse;
 import trainer.api.backend.service.IUsuarioRegistro;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api/v1")
 public class UsuarioRegistroController {
@@ -198,6 +197,29 @@ public class UsuarioRegistroController {
                 .mensaje("La contraseña no es correcta")
                 .object(null).build(),
             HttpStatus.BAD_REQUEST);
+    }
+
+    // Nuevo endpoint para login con Google
+    @PostMapping("usuarioRegistro/google-login")
+    public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> payload) {
+        String idToken = payload != null ? payload.get("idToken") : null;
+        if (ObjectUtils.isEmpty(idToken)) {
+            return new ResponseEntity<>(MensajeResponse.builder()
+                    .mensaje("idToken no proporcionado")
+                    .object(null).build(), HttpStatus.BAD_REQUEST);
+        }
+
+        // Delegar verificación y creación en el servicio
+        var usuario = usuarioRegistroService.googleLogin(idToken);
+        if (ObjectUtils.isEmpty(usuario)) {
+            return new ResponseEntity<>(MensajeResponse.builder()
+                    .mensaje("Token inválido o error al verificar con Google")
+                    .object(null).build(), HttpStatus.UNAUTHORIZED);
+        }
+
+        return new ResponseEntity<>(MensajeResponse.builder()
+                .mensaje("Usuario creado/logueado con Google correctamente")
+                .object(usuario).build(), HttpStatus.OK);
     }
 
     @PatchMapping("usuarioRegistro/cambiarAvatar/{id}")

@@ -1,7 +1,6 @@
 package trainer.api.backend.service;
 
 import trainer.api.backend.model.dto.InformeDTO;
-import trainer.api.backend.model.entity.Informe;
 
 import java.util.List;
 

@@ -14,12 +14,8 @@ import trainer.api.backend.model.entity.enums.Sexo;
 import trainer.api.backend.service.IInforme;
 
 import java.sql.Date;
-import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -43,7 +39,7 @@ public class InformeImpl implements IInforme {
         Double peso = informeDto.getPeso();
         int altura = informeDto.getAltura();
 
-        // Convertir el DTO en entidad
+        // Convertir el DTO en entidad (MapStruct convertirá fechaRegistro String -> Date usando el dateFormat)
         Informe informe = mapperFactory.getInformeMapper().toEntity(informeDto);
 
         // Sobrescribir los cálculos que no deben venir del cliente
@@ -51,7 +47,6 @@ public class InformeImpl implements IInforme {
         informe.setSexo(sexo);
         informe.setImc(calculateIMC(peso, altura));
         informe.setTmb(calculateTMB(peso, altura, edad, sexo.name(), informeDto.getDiasEntreno()));
-        informe.setFechaRegistro(dateToTimestamp(informeDto.getFechaRegistro().toString()));
 
         // Guardar
         Informe saved = informeDaoService.save(informe);
@@ -71,14 +66,6 @@ public class InformeImpl implements IInforme {
         return edad;
     }
 
-    private static Timestamp dateToTimestamp(String fecha) {
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-        LocalDate localDate = LocalDate.parse(fecha, dtf);
-        LocalDateTime localDateTime = localDate.atStartOfDay();
-
-        // Convertir LocalDateTime a Timestamp
-        return Timestamp.valueOf(localDateTime);
-    }
 
     private static Double calculateTMB(Double peso, int altura, int edad, String sexo, int diasEntreno) {
         double tmbAprox = (10 * peso) + (6.25 * altura) - (5 * edad) + (sexo.equals("MASCULINO") ? 5 : -161);

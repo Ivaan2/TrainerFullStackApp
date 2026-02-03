@@ -47,5 +47,16 @@ public class UsuarioRegistroDTO {
 
     // Opcional: incluir lista de objetivos si se necesita enviar al frontend
     private List<ObjetivoDTO> objetivos;
+
+    /*
+     * Public access to the user's last objective
+     */
+    public ObjetivoDTO getLastObjetivo() {
+        if (objetivos == null || objetivos.isEmpty()) {
+            return null;
+        }
+        // Suponiendo que los objetivos están ordenados por fecha, devolver el último
+        return objetivos.get(objetivos.size() - 1);
+    }
 }
 

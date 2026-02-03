@@ -2,6 +2,7 @@ package trainer.api.backend.config.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+
 import trainer.api.backend.model.dto.ObjetivoDTO;
 import trainer.api.backend.model.entity.Objetivo;
 

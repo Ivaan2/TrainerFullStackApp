@@ -1,5 +1,6 @@
 package trainer.api.backend.model.entity;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +10,8 @@ import trainer.api.backend.model.entity.enums.NivelActividad;
 import trainer.api.backend.model.entity.enums.SeguimientoDieta;
 import trainer.api.backend.model.entity.enums.Sexo;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -90,7 +91,8 @@ public class Informe {
     private Double tmb;
 
     @Column(name = "F_FECHA_REGISTRO", nullable = false)
-    private Timestamp fechaRegistro;
+    @Schema(description = "Report date", example = "20/12/2023")
+    private Date fechaRegistro;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FK_OBJETIVO", nullable = false)
